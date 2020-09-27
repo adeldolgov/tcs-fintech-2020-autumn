@@ -3,12 +3,13 @@ package com.adeldolgov.homework_1.ui.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.adeldolgov.homework_1.R
 import com.adeldolgov.homework_1.data.POJO.ContactData
-import com.adeldolgov.homework_1.ui.viewholder.ContactViewHolder
+import kotlinx.android.synthetic.main.item_contact.view.*
 import java.util.*
 
 class ContactAdapter(private val list: ArrayList<ContactData>) :
-    RecyclerView.Adapter<ContactViewHolder>() {
+    RecyclerView.Adapter<ContactAdapter.ContactViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -20,4 +21,15 @@ class ContactAdapter(private val list: ArrayList<ContactData>) :
     }
 
     override fun getItemCount(): Int = list.size
+
+    class ContactViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
+        RecyclerView.ViewHolder(inflater.inflate(R.layout.item_contact, parent, false)) {
+
+        fun bind(contact: ContactData) {
+            with(itemView) {
+                contactName.text = contact.displayName
+                contactPhoneNumber.text = contact.phoneNumber
+            }
+        }
+    }
 }
