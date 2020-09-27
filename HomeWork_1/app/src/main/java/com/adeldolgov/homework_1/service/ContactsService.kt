@@ -39,10 +39,7 @@ class ContactsService : IntentService("ContactsService") {
         )
     }
 
-    private fun sendSuccessStatus(
-        broadcaster: LocalBroadcastManager,
-        result: ArrayList<ContactData>
-    ) {
+    private fun sendSuccessStatus(broadcaster: LocalBroadcastManager, result: ArrayList<ContactData>) {
         broadcaster.sendBroadcast(
             Intent(CONTACTS_INTENT_FILTER)
                 .putExtra(RESULT_EXTRA, Status.SUCCESS)
