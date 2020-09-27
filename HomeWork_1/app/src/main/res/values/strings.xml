@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">HomeWork_1</string>
+
+    <!-- Actions -->
+    <string name="action_get_contacts">G3T_C0NT4CTS</string>
+
+    <!-- Permissions -->
+    <string name="contacts_permission">Пожалуйста, предоставьте доступ к контактам для того чтобы продолжить.</string>
+
+    <!-- Status -->
+    <string name="status_fetching_contacts">Получаем данные о контактах…</string>
+    <string name="status_error">Ошибка\n%s</string>
+    <string name="status_success">Успешно!</string>
+
+</resources>
