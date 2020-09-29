@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="com.adeldolgov.homework_2.ui.viewgroup.SocialPostViewGroup">
+
+    <TextView
+        android:id="@+id/postOwnerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:text="Post Owner" />
+
+    <TextView
+        android:id="@+id/postTimeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        tools:text="5 minutes ago" />
+
+    <ImageView
+        android:id="@+id/postOwnerImage"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        tools:src="@drawable/ic_linkedin_round" />
+
+    <TextView
+        android:id="@+id/postContentText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nCras vitae ex molestie, vulputate nisl vel, placerat dolor. Donec elementum nibh vitae gravida cursus." />
+
+    <ImageView
+        android:id="@+id/postContentImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:adjustViewBounds="true"
+        android:maxHeight="264dp"
+        android:minHeight="0dp"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/ic_launcher_background" />
+
+    <ImageButton
+        android:id="@+id/postLikeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_favorite_outline" />
+
+    <ImageButton
+        android:id="@+id/postCommentBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_comment" />
+
+    <ImageButton
+        android:id="@+id/postShareBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_share" />
+
+</merge>

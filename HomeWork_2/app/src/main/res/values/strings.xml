@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">HomeWork_2</string>
+
+    <!-- Example post -->
+    <string name="owner_tinkoff">Tinkoff Android 2020</string>
+    <string name="time_ago">5 minutes ago</string>
+    <string name="post_content">Занятия проходят по вторникам в Zoom. По некоторым лекциям предусмотрены семинары, которые проходят по четвергам.
+        \nНачало занятий в 18.00, продолжительность примерно 1.5-2 часа. Об изменениях в расписании и дополнительных занятиях будем сообщать заранее здесь и в чате.</string>
+
+
+</resources>
