@@ -47,8 +47,14 @@ class SocialPostViewGroup @JvmOverloads constructor(
         height += postLikeBtn.marginTop
         height += postLikeBtn.marginBottom
 
+        measureChildWithMargins(postLikeCountText, widthMeasureSpec, 0, heightMeasureSpec, height)
+
         measureChildWithMargins(postCommentBtn, widthMeasureSpec, 0, heightMeasureSpec, height)
+        measureChildWithMargins(postCommentCountText, widthMeasureSpec, 0, heightMeasureSpec, height)
+
         measureChildWithMargins(postShareBtn, widthMeasureSpec, 0, heightMeasureSpec, height)
+        measureChildWithMargins(postShareCountText, widthMeasureSpec, 0, heightMeasureSpec, height)
+
 
         setMeasuredDimension(desiredWidth, View.resolveSize(height, heightMeasureSpec))
     }
@@ -101,6 +107,12 @@ class SocialPostViewGroup @JvmOverloads constructor(
             currentLeft + postLikeBtn.measuredWidth + postLikeBtn.marginStart,
             currentTop + postLikeBtn.marginTop + postLikeBtn.measuredHeight
         )
+        postLikeCountText.layout(
+            postLikeBtn.right + postLikeCountText.marginStart,
+            postLikeBtn.top + (postLikeBtn.bottom - postLikeBtn.top) / 2 - postLikeCountText.measuredHeight / 2,
+            postLikeBtn.right + postLikeCountText.measuredWidth + postLikeCountText.marginStart,
+            postLikeBtn.top + (postLikeBtn.bottom - postLikeBtn.top) / 2 + postLikeCountText.measuredHeight / 2
+        )
 
         postCommentBtn.layout(
             postLikeBtn.right + postCommentBtn.marginStart,
@@ -108,12 +120,24 @@ class SocialPostViewGroup @JvmOverloads constructor(
             postLikeBtn.right + postCommentBtn.measuredWidth + postCommentBtn.marginStart,
             currentTop + postCommentBtn.marginTop + postCommentBtn.measuredHeight
         )
+        postCommentCountText.layout(
+            postCommentBtn.right + postCommentCountText.marginStart,
+            postCommentBtn.top + (postCommentBtn.bottom - postCommentBtn.top) / 2 - postCommentCountText.measuredHeight / 2,
+            postCommentBtn.right + postCommentCountText.measuredWidth + postCommentCountText.marginStart,
+            postCommentBtn.top + (postCommentBtn.bottom - postCommentBtn.top) / 2 + postCommentCountText.measuredHeight / 2
+        )
 
         postShareBtn.layout(
             postCommentBtn.right + postShareBtn.marginStart,
             currentTop + postShareBtn.marginTop,
             postCommentBtn.right + postShareBtn.measuredWidth + postShareBtn.marginStart,
             currentTop + postShareBtn.marginTop + postShareBtn.measuredHeight
+        )
+        postShareCountText.layout(
+            postShareBtn.right + postShareCountText.marginStart,
+            postShareBtn.top + (postShareBtn.bottom - postShareBtn.top) / 2 - postShareCountText.measuredHeight / 2,
+            postShareBtn.right + postShareCountText.measuredWidth + postShareCountText.marginStart,
+            postShareBtn.top + (postShareBtn.bottom - postShareBtn.top) / 2 + postShareCountText.measuredHeight / 2
         )
 
     }
