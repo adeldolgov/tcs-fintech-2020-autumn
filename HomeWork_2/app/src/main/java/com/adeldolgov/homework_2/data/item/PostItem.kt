@@ -1,7 +1,10 @@
 package com.adeldolgov.homework_2.data.item
 
+import android.os.Parcelable
 import com.adeldolgov.homework_2.data.pojo.Attachment
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class PostItem (
     val id: Long,
     val sourceName: String,
@@ -13,7 +16,7 @@ data class PostItem (
     var likes: Int,
     var reposts: Int,
     var comments: Int
-) {
+) : Parcelable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

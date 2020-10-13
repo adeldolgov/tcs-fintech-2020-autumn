@@ -9,9 +9,9 @@ class Post(
     val sourceId: Long,
     val text: String,
     val attachments: Array<Attachment>?,
-    val likes: Count,
-    val reposts: Count,
-    val comments: Count
+    val likes: Like,
+    val reposts: Repost,
+    val comments: Comment
 )
 
 fun Post.toPostItem(source: Source) = PostItem(

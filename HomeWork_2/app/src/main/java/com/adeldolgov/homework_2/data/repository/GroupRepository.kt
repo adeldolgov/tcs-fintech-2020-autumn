@@ -3,8 +3,8 @@ package com.adeldolgov.homework_2.data.repository
 import com.adeldolgov.homework_2.api.DataGenerator
 import com.adeldolgov.homework_2.data.pojo.Source
 
-object GroupRepository {
-    fun getGroups(): Array<Source> {
+class GroupRepository {
+    fun getGroups(): List<Source> {
         return DataGenerator().getGroups()
     }
     fun getGroupBySourceId(sourceId: Long): Source? {

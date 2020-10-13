@@ -7,23 +7,29 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.adeldolgov.homework_2.R
 import com.adeldolgov.homework_2.data.item.PostItem
-import com.adeldolgov.homework_2.ui.ItemTouchHelper.LDItemTouchHelperCallback
 import com.adeldolgov.homework_2.ui.decorator.DateItemDecoration
 import com.adeldolgov.homework_2.ui.diffutil.PostDiffUtilsCallback
+import com.adeldolgov.homework_2.ui.itemtouchhelper.SwipeItemTouchHelperCallback
 import com.adeldolgov.homework_2.util.compareToExcludeTime
+import com.adeldolgov.homework_2.util.imageloader.GlideImageLoader
+import com.adeldolgov.homework_2.util.imageloader.ImageLoader
 import com.adeldolgov.homework_2.util.toRelativeDateString
 import com.adeldolgov.homework_2.util.toRelativeDateStringDay
-import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.view_social_post.view.*
 import java.util.*
 
 private const val POST_TEXT_ONLY = 0
 private const val POST_IMAGE = 1
 
-class PostAdapter(val clickListener: (Int) -> Unit) : RecyclerView.Adapter<PostAdapter.BaseViewHolder>(),
-    LDItemTouchHelperCallback.LDItemTouchHelperAdapter, DateItemDecoration.DateItemInterface {
+class PostAdapter(
+    val swipeLeftListener: (PostItem) -> Unit,
+    val swipeRightListener: (PostItem) -> Unit,
+    val onClickListener: (Int, PostItem) -> Unit
+) : RecyclerView.Adapter<PostAdapter.BaseViewHolder>(),
+    SwipeItemTouchHelperCallback.SwipeItemTouchHelperAdapter, DateItemDecoration.DateItemInterface {
 
     private val diffUtil = AsyncListDiffer(this, PostDiffUtilsCallback())
+    private val imageLoader: ImageLoader = GlideImageLoader()
 
     var list: List<PostItem> = emptyList()
         set(value) {
@@ -39,9 +45,26 @@ class PostAdapter(val clickListener: (Int) -> Unit) : RecyclerView.Adapter<PostA
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            POST_TEXT_ONLY -> PostViewHolder(inflater.inflate(R.layout.item_post, parent, false)) { clickListener(it) }
-            POST_IMAGE -> PostWithImageViewHolder(inflater.inflate(R.layout.item_post, parent, false)) { clickListener(it) }
-            else -> BaseViewHolder(inflater.inflate(R.layout.item_post, parent, false)) { clickListener(it) }
+            POST_IMAGE -> {
+                PostWithImageViewHolder(inflater.inflate(R.layout.item_post, parent, false),
+                    clickLikeListener = {
+                        swipeLeftListener(list[it])
+                    },
+                    clickListener = {
+                        onClickListener(it, list[it])
+                    },
+                    imageLoader = imageLoader)
+            }
+            else -> {
+                PostViewHolder(inflater.inflate(R.layout.item_post, parent, false),
+                    clickLikeListener = {
+                        swipeLeftListener(list[it])
+                    },
+                    clickListener = {
+                        onClickListener(it, list[it])
+                    },
+                    imageLoader = imageLoader)
+            }
         }
     }
 
@@ -59,23 +82,12 @@ class PostAdapter(val clickListener: (Int) -> Unit) : RecyclerView.Adapter<PostA
         return list[position].id
     }
 
-    override fun onItemHide(position: Int) {
-        list = list.toMutableList().apply {
-            removeAt(position)
-        }
+    override fun onItemSwipeRight(position: Int) {
+        swipeRightListener(list[position])
     }
 
-    override fun onItemLike(position: Int) {
-        /*list[position].isFavorite = !list[position].isFavorite
-        notifyItemChanged(position)
-        без diffUtils, напрямую
-        */
-        val oldItem = list[position]
-        val newItem = oldItem.copy(isFavorite = !oldItem.isFavorite, likes = if (oldItem.isFavorite) oldItem.likes - 1 else oldItem.likes + 1)
-        list = list.toMutableList().apply {
-            this[position] = newItem
-        }
-        notifyItemChanged(position) //вручную вернуть элемент списка из свайпа., т.к в DiffUtilsCallback овверайднут getChangePayload
+    override fun onItemSwipeLeft(position: Int) {
+        swipeLeftListener(list[position])
     }
 
     override fun shouldWriteDate(position: Int): Boolean {
@@ -90,23 +102,33 @@ class PostAdapter(val clickListener: (Int) -> Unit) : RecyclerView.Adapter<PostA
         return list[position].date.toRelativeDateStringDay()
     }
 
+    abstract class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        abstract fun bind(post: PostItem)
+    }
 
-    open class BaseViewHolder(view: View, clickLambda: (Int) -> Unit) : RecyclerView.ViewHolder(view) {
+    class PostWithImageViewHolder(
+        view: View,
+        clickLikeListener: (Int) -> Unit,
+        clickListener: (Int) -> Unit,
+        val imageLoader: ImageLoader
+    ) : BaseViewHolder(view) {
         init {
-            itemView.postLikeBtn.setOnClickListener { clickLambda(adapterPosition) }
+            itemView.postLikeBtn.setOnClickListener { clickLikeListener(adapterPosition) }
+            itemView.setOnClickListener { clickListener(adapterPosition) }
         }
-        open fun bind(post: PostItem) {
+        override fun bind(post: PostItem) {
             with(itemView) {
-                Glide.with(this)
-                    .load(post.sourceImage)
-                    .circleCrop()
-                    .into(postOwnerImage)
+                imageLoader.loadPoster(post.attachments?.get(0)?.photo?.sizes?.get(0)!!, postContentImage)
+                imageLoader.loadRoundedAvatar(post.sourceImage, postOwnerImage)
+
+                postContentText.text = post.text
+                postOwnerText.text = post.sourceName
+
                 if (post.isFavorite) {
                     postLikeBtn.setImageDrawable(context.getDrawable(R.drawable.ic_favorite))
                 } else {
                     postLikeBtn.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_outline))
                 }
-                postOwnerText.text = post.sourceName
                 postTimeText.text = post.date.toRelativeDateString()
                 postLikeCountText.text = post.likes.toString()
                 postShareCountText.text = post.reposts.toString()
@@ -115,24 +137,32 @@ class PostAdapter(val clickListener: (Int) -> Unit) : RecyclerView.Adapter<PostA
         }
     }
 
-    class PostWithImageViewHolder(view: View, clickLambda: (Int) -> Unit) : BaseViewHolder(view, clickLambda) {
-        override fun bind(post: PostItem) {
-            super.bind(post)
-            with(itemView) {
-                Glide.with(this)
-                    .load(post.attachments?.get(0)?.photo?.sizes?.get(0))
-                    .fitCenter()
-                    .into(postContentImage)
-                postContentText.text = post.text
-            }
+    class PostViewHolder(
+        view: View,
+        clickLikeListener: (Int) -> Unit,
+        clickListener: (Int) -> Unit,
+        val imageLoader: ImageLoader
+    ) : BaseViewHolder(view) {
+        init {
+            itemView.postLikeBtn.setOnClickListener { clickLikeListener(adapterPosition) }
+            itemView.setOnClickListener { clickListener(adapterPosition) }
         }
-    }
-
-    class PostViewHolder(view: View, clickLambda: (Int) -> Unit) : BaseViewHolder(view, clickLambda) {
         override fun bind(post: PostItem) {
-            super.bind(post)
             with(itemView) {
+                imageLoader.loadRoundedAvatar(post.sourceImage, postOwnerImage)
+
                 postContentText.text = post.text
+                postOwnerText.text = post.sourceName
+
+                if (post.isFavorite) {
+                    postLikeBtn.setImageDrawable(context.getDrawable(R.drawable.ic_favorite))
+                } else {
+                    postLikeBtn.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_outline))
+                }
+                postTimeText.text = post.date.toRelativeDateString()
+                postLikeCountText.text = post.likes.toString()
+                postShareCountText.text = post.reposts.toString()
+                postCommentCountText.text = post.comments.toString()
             }
         }
     }
