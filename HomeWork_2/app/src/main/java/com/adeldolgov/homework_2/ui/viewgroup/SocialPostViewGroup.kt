@@ -2,21 +2,26 @@ package com.adeldolgov.homework_2.ui.viewgroup
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import androidx.core.view.children
 import androidx.core.view.marginBottom
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.adeldolgov.homework_2.R
 import kotlinx.android.synthetic.main.view_social_post.view.*
+import kotlin.math.max
 
 class SocialPostViewGroup @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ViewGroup(context, attributeSet, defStyleAttr) {
+    private val metrics = DisplayMetrics()
 
     init {
         setWillNotDraw(true)
@@ -24,7 +29,7 @@ class SocialPostViewGroup @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val desiredWidth = MeasureSpec.getSize(widthMeasureSpec)
+
         var height = 0
 
         measureChildWithMargins(postOwnerImage, widthMeasureSpec, 0, heightMeasureSpec, height)
@@ -55,13 +60,33 @@ class SocialPostViewGroup @JvmOverloads constructor(
         measureChildWithMargins(postShareBtn, widthMeasureSpec, 0, heightMeasureSpec, height)
         measureChildWithMargins(postShareCountText, widthMeasureSpec, 0, heightMeasureSpec, height)
 
+        val desiredWidth = if (widthMeasureSpec == MeasureSpec.UNSPECIFIED) {
+            display.getMetrics(metrics)
+            when (layoutParams.width) {
+                MATCH_PARENT -> {
+                    postContentText.maxWidth = metrics.widthPixels
+                    postContentImage.maxWidth = metrics.widthPixels
+                    metrics.widthPixels
+                }
+                WRAP_CONTENT -> {
+                    var maxRowWidth = 0
+                    children.forEach { child ->
+                        maxRowWidth = max(maxRowWidth, child.measuredWidth)
+                    }
+                    maxRowWidth
+                }
+                else -> layoutParams.width
+            }
+        } else {
+            MeasureSpec.getSize(widthMeasureSpec)
+        }
 
         setMeasuredDimension(desiredWidth, View.resolveSize(height, heightMeasureSpec))
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        val currentLeft = l + paddingLeft
-        var currentTop = t + paddingTop
+        val currentLeft = paddingLeft
+        var currentTop = paddingTop
 
         postOwnerImage.layout(
             currentLeft + postOwnerImage.marginStart,
@@ -78,7 +103,7 @@ class SocialPostViewGroup @JvmOverloads constructor(
         postTimeText.layout(
             currentLeft + postOwnerImage.right + postTimeText.marginStart,
             currentTop + postOwnerText.bottom + postTimeText.marginTop,
-            currentLeft + postOwnerImage.right + postOwnerText.measuredWidth + postTimeText.marginStart,
+            currentLeft + postOwnerImage.right + postTimeText.measuredWidth + postTimeText.marginStart,
             currentTop + postOwnerText.bottom + postTimeText.marginTop + postTimeText.measuredHeight)
 
         currentTop = postOwnerImage.bottom
@@ -115,9 +140,9 @@ class SocialPostViewGroup @JvmOverloads constructor(
         )
 
         postCommentBtn.layout(
-            postLikeBtn.right + postCommentBtn.marginStart,
+            postLikeCountText.right + postCommentBtn.marginStart,
             currentTop + postCommentBtn.marginTop,
-            postLikeBtn.right + postCommentBtn.measuredWidth + postCommentBtn.marginStart,
+            postLikeCountText.right + postCommentBtn.measuredWidth + postCommentBtn.marginStart,
             currentTop + postCommentBtn.marginTop + postCommentBtn.measuredHeight
         )
         postCommentCountText.layout(
@@ -128,9 +153,9 @@ class SocialPostViewGroup @JvmOverloads constructor(
         )
 
         postShareBtn.layout(
-            postCommentBtn.right + postShareBtn.marginStart,
+            postCommentCountText.right + postShareBtn.marginStart,
             currentTop + postShareBtn.marginTop,
-            postCommentBtn.right + postShareBtn.measuredWidth + postShareBtn.marginStart,
+            postCommentCountText.right + postShareBtn.measuredWidth + postShareBtn.marginStart,
             currentTop + postShareBtn.marginTop + postShareBtn.measuredHeight
         )
         postShareCountText.layout(

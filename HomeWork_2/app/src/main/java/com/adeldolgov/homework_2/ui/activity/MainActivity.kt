@@ -2,35 +2,50 @@ package com.adeldolgov.homework_2.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.adeldolgov.homework_2.R
-import com.bumptech.glide.Glide
+import com.adeldolgov.homework_2.data.item.PostItem
+import com.adeldolgov.homework_2.data.pojo.toPostItem
+import com.adeldolgov.homework_2.data.repository.GroupRepository
+import com.adeldolgov.homework_2.data.repository.PostRepository
+import com.adeldolgov.homework_2.ui.ItemTouchHelper.LDItemTouchHelperCallback
+import com.adeldolgov.homework_2.ui.adapter.PostAdapter
+import com.adeldolgov.homework_2.ui.decorator.DateItemDecoration
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.view_social_post.view.*
 
 class MainActivity : AppCompatActivity() {
+
+    private val postAdapter = PostAdapter { position -> setLikeToPost(position) }.apply { list = getPosts() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        fillExampleSocialPost()
+
+        postRecyclerView.apply {
+            adapter = postAdapter
+            ItemTouchHelper(LDItemTouchHelperCallback(postAdapter)).attachToRecyclerView(this)
+            addItemDecoration(DateItemDecoration(postAdapter))
+        }
+
+        swipeRefreshLayout.setOnRefreshListener {
+            postAdapter.list = getPosts()
+            swipeRefreshLayout.isRefreshing = false
+            postRecyclerView.post {
+                postRecyclerView.scrollToPosition(0)
+            }
+        }
     }
 
-    private fun fillExampleSocialPost() {
-        socialPostExample.postOwnerText.text = getString(R.string.owner_tinkoff)
-        socialPostExample.postTimeText.text = getString(R.string.time_ago)
-        socialPostExample.postContentText.text = getString(R.string.post_content)
-        socialPostExample.postLikeCountText.text = getString(R.string.likes_count)
-        socialPostExample.postCommentCountText.text = getString(R.string.comments_count)
-        socialPostExample.postShareCountText.text = getString(R.string.sharing_count)
-
-        Glide.with(this)
-            .load(ContextCompat.getDrawable(this, R.drawable.ic_tinkoff))
-            .circleCrop()
-            .into(socialPostExample.postOwnerImage)
-        Glide.with(this)
-            .load(ContextCompat.getDrawable(this, R.drawable.ic_post_example))
-            .centerCrop()
-            .into(socialPostExample.postContentImage)
+    private fun getPosts(): List<PostItem> {
+        return PostRepository.getPosts().mapNotNull { post ->
+            GroupRepository.getGroupBySourceId(post.sourceId)?.let {
+                post.toPostItem(it)
+            }
+        }
     }
+
+    private fun setLikeToPost(position: Int) {
+        postAdapter.onItemLike(position)
+    }
+
 }

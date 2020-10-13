@@ -2,7 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:parentTag="com.adeldolgov.homework_2.ui.viewgroup.SocialPostViewGroup">
 
     <TextView
@@ -17,10 +17,10 @@
 
     <TextView
         android:id="@+id/postTimeText"
+        style="@style/SecondaryTextTheme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        style="@style/SecondaryTextTheme"
         tools:text="5 minutes ago" />
 
     <ImageView
@@ -33,7 +33,7 @@
 
     <TextView
         android:id="@+id/postContentText"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
@@ -49,9 +49,6 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:adjustViewBounds="true"
-        android:maxHeight="264dp"
-        android:minHeight="0dp"
-        android:scaleType="centerCrop"
         tools:src="@drawable/ic_launcher_background" />
 
     <ImageButton
