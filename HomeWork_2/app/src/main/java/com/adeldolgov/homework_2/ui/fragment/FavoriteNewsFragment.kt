@@ -23,18 +23,18 @@ import com.adeldolgov.homework_2.ui.itemtouchhelper.SwipeItemTouchHelperCallback
 import kotlinx.android.synthetic.main.fragment_news.*
 import kotlinx.android.synthetic.main.view_social_post.view.*
 
-class NewsFragment : Fragment() {
+class FavoriteNewsFragment : Fragment() {
 
     companion object {
-        fun newInstance() = NewsFragment()
-        const val TAG = "NewsFragment"
+        fun newInstance() = FavoriteNewsFragment()
+        const val TAG = "FavoriteNewsFragment"
     }
 
     private val postViewModel: PostsViewModel by activityViewModels()
     private val postAdapter = PostAdapter(swipeLeftListener = {
         postViewModel.changePostLike(it)
     }, swipeRightListener = {
-        postViewModel.removePostAt(it)
+        postViewModel.changePostLike(it)
     }, onClickListener = { position, postItem ->
         val viewHolder = postRecyclerView.findViewHolderForAdapterPosition(position)
         if (viewHolder != null) {
@@ -50,10 +50,8 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         postViewModel.postList.observe(viewLifecycleOwner, Observer {
-            postAdapter.list = it
-        })
-        postViewModel.postList.observe(viewLifecycleOwner, Observer {
             val favoritePostList = it.toMutableList().filter { postItem -> postItem.isFavorite }
+            postAdapter.list = favoritePostList
             newsFragmentListener?.onFavoriteVisibility(favoritePostList.isNotEmpty())
         })
 
@@ -69,6 +67,13 @@ class NewsFragment : Fragment() {
             postRecyclerView.post {
                 postRecyclerView.scrollToPosition(0)
             }
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnPostLikeListener) {
+            newsFragmentListener = context
         }
     }
 
@@ -101,13 +106,6 @@ class NewsFragment : Fragment() {
                 .putExtra(PostDetailsActivity.POST_EXTRA, postItem),
             options.toBundle()
         )
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnPostLikeListener) {
-            newsFragmentListener = context
-        }
     }
 
     interface OnPostLikeListener {

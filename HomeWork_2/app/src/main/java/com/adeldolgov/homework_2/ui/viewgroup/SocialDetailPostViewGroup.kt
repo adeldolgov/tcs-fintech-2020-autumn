@@ -13,9 +13,6 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.adeldolgov.homework_2.R
-import com.adeldolgov.homework_2.data.item.PostItem
-import com.adeldolgov.homework_2.util.imageloader.ImageLoader
-import com.adeldolgov.homework_2.util.toRelativeDateString
 import kotlinx.android.synthetic.main.view_social_post.view.*
 import kotlin.math.max
 
@@ -153,30 +150,9 @@ class SocialDetailPostViewGroup @JvmOverloads constructor(
 
     }
 
+
     override fun generateLayoutParams(attrs: AttributeSet?) = MarginLayoutParams(context, attrs)
 
     override fun generateDefaultLayoutParams() = MarginLayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-
-    fun setPostDetails(postItem: PostItem, imageLoader: ImageLoader, onImageClickListener: (String) -> Unit) {
-        postItem.attachments?.get(0)?.photo?.sizes?.get(0)?.let { url ->
-            imageLoader.loadPoster(url, postContentImage)
-            postContentImage.setOnClickListener {
-                onImageClickListener(url)
-            }
-        }
-        imageLoader.loadRoundedAvatar(postItem.sourceImage, postOwnerImage)
-
-        postContentText.text = postItem.text
-        postOwnerText.text = postItem.sourceName
-
-        if (postItem.isFavorite) {
-            postLikeBtn.setImageDrawable(context.getDrawable(R.drawable.ic_favorite))
-        } else {
-            postLikeBtn.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_outline))
-        }
-        postTimeText.text = postItem.date.toRelativeDateString()
-        postLikeCountText.text = postItem.likes.toString()
-        postShareCountText.text = postItem.reposts.toString()
-    }
 
 }
