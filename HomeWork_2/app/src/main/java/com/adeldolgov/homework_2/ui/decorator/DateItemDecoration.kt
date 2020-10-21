@@ -20,10 +20,10 @@ class DateItemDecoration(private val dateItemInterface: DateItemInterface) : Rec
     private val textBounds: Rect = Rect()
 
     companion object {
-        const val PADDING_TOP_DATE = 40
-        const val PADDING_DEFAULT = 4
-        const val DATE_TEXT_SIZE = 16
-        const val ROUND_RECTANGLE_RADIUS = 20f
+        private const val PADDING_TOP_DATE = 40
+        private const val PADDING_DEFAULT = 4
+        private const val DATE_TEXT_SIZE = 16
+        private const val ROUND_RECTANGLE_RADIUS = 20f
     }
 
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {

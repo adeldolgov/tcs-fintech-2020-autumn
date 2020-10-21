@@ -1,8 +1,15 @@
 <resources>
-
     <string name="app_name">HomeWork_2</string>
     <!-- Bottom bar menu -->
     <string name="news">Новости</string>
     <string name="favorite">Избранное</string>
-    
+
+    <!-- Error -->
+    <string name="error_dialog_header">Ошибка</string>
+    <string name="error_header">:-(</string>
+    <string name="error_header_empty">:-0</string>
+    <string name="error_empty">Новости отсутствуют. Обновите их попозже! :-)</string>
+
+
+
 </resources>

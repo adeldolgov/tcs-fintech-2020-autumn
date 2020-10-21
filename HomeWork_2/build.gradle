@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:4.0.1"
+        classpath "com.android.tools.build:gradle:4.0.2"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -32,6 +32,10 @@ ext {
     materialDesignVersion = '1.2.1'
     fragmentVersion = '1.2.5'
     lifecycleExtensionsVersion = '2.2.0'
+    rxJavaVersion = '2.2.20'
+    rxAndroidVersion = '2.1.1'
+    rxKotlinVersion = '2.4.0'
+    shimmerAndroidVersion = '0.5.0'
 }
 
 task clean(type: Delete) {

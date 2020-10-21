@@ -14,7 +14,7 @@ class Post(
     val comments: Comment
 )
 
-fun Post.toPostItem(source: Source) = PostItem(
+fun Post.toPostItem(source: Source): PostItem = PostItem(
     id = id,
     sourceName = source.name,
     sourceImage = source.photo100,
