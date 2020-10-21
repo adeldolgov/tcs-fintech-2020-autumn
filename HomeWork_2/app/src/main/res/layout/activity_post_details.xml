@@ -18,6 +18,7 @@
         app:cardPreventCornerOverlap="false">
 
         <com.adeldolgov.homework_2.ui.viewgroup.SocialDetailPostViewGroup
+            android:id="@+id/postDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

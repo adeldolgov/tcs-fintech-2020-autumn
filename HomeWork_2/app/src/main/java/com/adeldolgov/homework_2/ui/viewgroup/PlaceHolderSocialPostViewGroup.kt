@@ -9,17 +9,13 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.core.view.children
-import androidx.core.view.marginBottom
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.adeldolgov.homework_2.R
-import com.adeldolgov.homework_2.data.item.PostItem
-import com.adeldolgov.homework_2.util.imageloader.ImageLoader
-import com.adeldolgov.homework_2.util.toRelativeDateString
 import kotlinx.android.synthetic.main.view_social_post.view.*
 import kotlin.math.max
 
-class SocialDetailPostViewGroup @JvmOverloads constructor(
+class PlaceHolderSocialPostViewGroup @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -28,7 +24,7 @@ class SocialDetailPostViewGroup @JvmOverloads constructor(
 
     init {
         setWillNotDraw(true)
-        LayoutInflater.from(context).inflate(R.layout.view_social_post_details, this, true)
+        LayoutInflater.from(context).inflate(R.layout.view_social_post_placeholder, this, true)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -49,15 +45,6 @@ class SocialDetailPostViewGroup @JvmOverloads constructor(
         measureChildWithMargins(postContentImage, widthMeasureSpec, 0, heightMeasureSpec, height)
         height += postContentImage.measuredHeight
         height += postContentImage.marginTop
-
-        measureChildWithMargins(postLikeBtn, widthMeasureSpec, 0, heightMeasureSpec, height)
-        height += postLikeBtn.measuredHeight
-        height += postLikeBtn.marginTop
-        height += postLikeBtn.marginBottom
-
-        measureChildWithMargins(postLikeCountText, widthMeasureSpec, 0, heightMeasureSpec, height)
-        measureChildWithMargins(postShareBtn, widthMeasureSpec, 0, heightMeasureSpec, height)
-        measureChildWithMargins(postShareCountText, widthMeasureSpec, 0, heightMeasureSpec, height)
 
         val desiredWidth = if (widthMeasureSpec == MeasureSpec.UNSPECIFIED) {
             display.getMetrics(metrics)
@@ -107,15 +94,6 @@ class SocialDetailPostViewGroup @JvmOverloads constructor(
 
         currentTop = postOwnerImage.bottom
 
-        postContentImage.layout(
-            measuredWidth / 2 - postContentImage.measuredWidth / 2,
-            currentTop + postContentImage.marginTop,
-            measuredWidth / 2 + postContentImage.measuredWidth / 2,
-            currentTop + postContentImage.marginTop + postContentImage.measuredHeight
-        )
-
-        currentTop = postContentImage.bottom
-
         postContentText.layout(
             currentLeft + postContentText.marginStart,
             currentTop + postContentText.marginTop,
@@ -125,58 +103,17 @@ class SocialDetailPostViewGroup @JvmOverloads constructor(
 
         currentTop = postContentText.bottom
 
-        postLikeBtn.layout(
-            currentLeft + postLikeBtn.marginStart,
-            currentTop + postLikeBtn.marginTop,
-            currentLeft + postLikeBtn.measuredWidth + postLikeBtn.marginStart,
-            currentTop + postLikeBtn.marginTop + postLikeBtn.measuredHeight
+        postContentImage.layout(
+            measuredWidth / 2 - postContentImage.measuredWidth / 2,
+            currentTop + postContentImage.marginTop,
+            measuredWidth / 2 + postContentImage.measuredWidth / 2,
+            currentTop + postContentImage.marginTop + postContentImage.measuredHeight
         )
-        postLikeCountText.layout(
-            postLikeBtn.right + postLikeCountText.marginStart,
-            postLikeBtn.top + (postLikeBtn.bottom - postLikeBtn.top) / 2 - postLikeCountText.measuredHeight / 2,
-            postLikeBtn.right + postLikeCountText.measuredWidth + postLikeCountText.marginStart,
-            postLikeBtn.top + (postLikeBtn.bottom - postLikeBtn.top) / 2 + postLikeCountText.measuredHeight / 2
-        )
-
-        postShareBtn.layout(
-            postLikeCountText.right + postShareBtn.marginStart,
-            currentTop + postShareBtn.marginTop,
-            postLikeCountText.right + postShareBtn.measuredWidth + postShareBtn.marginStart,
-            currentTop + postShareBtn.marginTop + postShareBtn.measuredHeight
-        )
-        postShareCountText.layout(
-            postShareBtn.right + postShareCountText.marginStart,
-            postShareBtn.top + (postShareBtn.bottom - postShareBtn.top) / 2 - postShareCountText.measuredHeight / 2,
-            postShareBtn.right + postShareCountText.measuredWidth + postShareCountText.marginStart,
-            postShareBtn.top + (postShareBtn.bottom - postShareBtn.top) / 2 + postShareCountText.measuredHeight / 2
-        )
-
     }
+
 
     override fun generateLayoutParams(attrs: AttributeSet?) = MarginLayoutParams(context, attrs)
 
     override fun generateDefaultLayoutParams() = MarginLayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-
-    fun setPostDetails(postItem: PostItem, imageLoader: ImageLoader, onImageClickListener: (String) -> Unit) {
-        postItem.attachments?.get(0)?.photo?.sizes?.get(0)?.let { url ->
-            imageLoader.loadPoster(url, postContentImage)
-            postContentImage.setOnClickListener {
-                onImageClickListener(url)
-            }
-        }
-        imageLoader.loadRoundedAvatar(postItem.sourceImage, postOwnerImage)
-
-        postContentText.text = postItem.text
-        postOwnerText.text = postItem.sourceName
-
-        if (postItem.isFavorite) {
-            postLikeBtn.setImageDrawable(context.getDrawable(R.drawable.ic_favorite))
-        } else {
-            postLikeBtn.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_outline))
-        }
-        postTimeText.text = postItem.date.toRelativeDateString()
-        postLikeCountText.text = postItem.likes.toString()
-        postShareCountText.text = postItem.reposts.toString()
-    }
 
 }

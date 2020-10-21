@@ -6,11 +6,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.adeldolgov.homework_2.R
 import com.adeldolgov.homework_2.domain.viewmodel.PostsViewModel
-import com.adeldolgov.homework_2.ui.fragment.FavoriteNewsFragment
 import com.adeldolgov.homework_2.ui.fragment.NewsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(R.layout.activity_main), NewsFragment.OnPostLikeListener, FavoriteNewsFragment.OnPostLikeListener {
+class MainActivity : AppCompatActivity(R.layout.activity_main), NewsFragment.OnPostLikeListener {
 
     private var postViewModel: PostsViewModel? = null
 
@@ -20,11 +19,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), NewsFragment.OnP
         mainBottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.news -> {
-                    commitFragment(NewsFragment.newInstance(), NewsFragment.TAG)
+                    commitFragment(NewsFragment.newInstance(false), NewsFragment::class.java.name.plus(":true"))
                     true
                 }
                 R.id.favorites -> {
-                    commitFragment(FavoriteNewsFragment.newInstance(), FavoriteNewsFragment.TAG)
+                    commitFragment(NewsFragment.newInstance(true), NewsFragment::class.java.name.plus(":false"))
                     true
                 }
                 else -> false
@@ -54,8 +53,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), NewsFragment.OnP
 
     private fun setBottomTabByTag(tag: String) {
         when(tag) {
-            NewsFragment.TAG -> mainBottomNavigation.menu.findItem(R.id.news).isChecked = true
-            FavoriteNewsFragment.TAG -> mainBottomNavigation.menu.findItem(R.id.favorites).isChecked = true
+            NewsFragment::class.java.name.plus(":true") -> mainBottomNavigation.menu.findItem(R.id.news).isChecked = true
+            NewsFragment::class.java.name.plus(":false") -> mainBottomNavigation.menu.findItem(R.id.favorites).isChecked = true
         }
     }
 

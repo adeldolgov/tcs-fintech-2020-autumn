@@ -2,12 +2,14 @@ package com.adeldolgov.homework_2.ui.fragment
 
 import android.app.ActivityOptions
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -20,27 +22,29 @@ import com.adeldolgov.homework_2.ui.activity.PostDetailsActivity
 import com.adeldolgov.homework_2.ui.adapter.PostAdapter
 import com.adeldolgov.homework_2.ui.decorator.DateItemDecoration
 import com.adeldolgov.homework_2.ui.itemtouchhelper.SwipeItemTouchHelperCallback
+import com.adeldolgov.homework_2.util.Status
+import com.adeldolgov.homework_2.util.isShimmering
 import kotlinx.android.synthetic.main.fragment_news.*
+import kotlinx.android.synthetic.main.view_error.*
+import kotlinx.android.synthetic.main.view_social_list_shimmer.*
 import kotlinx.android.synthetic.main.view_social_post.view.*
 
 class NewsFragment : Fragment() {
 
     companion object {
-        fun newInstance() = NewsFragment()
-        const val TAG = "NewsFragment"
+        private const val FAVORITE_ONLY = "favorite_only"
+
+        fun newInstance(favoriteNews: Boolean): NewsFragment = NewsFragment().apply {
+            arguments = bundleOf(FAVORITE_ONLY to favoriteNews)
+        }
     }
 
     private val postViewModel: PostsViewModel by activityViewModels()
-    private val postAdapter = PostAdapter(swipeLeftListener = {
-        postViewModel.changePostLike(it)
-    }, swipeRightListener = {
-        postViewModel.removePostAt(it)
-    }, onClickListener = { position, postItem ->
-        val viewHolder = postRecyclerView.findViewHolderForAdapterPosition(position)
-        if (viewHolder != null) {
-            startDetailsActivity(viewHolder, postItem)
-        }
-    })
+    private val postAdapter = PostAdapter(
+        { postViewModel.changePostLike(it) },
+        { postViewModel.removePostAt(it) },
+        { position, postItem -> prepareDetailOptions(position, postItem) })
+    private var shouldScrollToStart = false
     private var newsFragmentListener: OnPostLikeListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,11 +54,16 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         postViewModel.postList.observe(viewLifecycleOwner, Observer {
-            postAdapter.list = it
-        })
-        postViewModel.postList.observe(viewLifecycleOwner, Observer {
-            val favoritePostList = it.toMutableList().filter { postItem -> postItem.isFavorite }
-            newsFragmentListener?.onFavoriteVisibility(favoritePostList.isNotEmpty())
+            Log.d(NewsFragment::class.java.name, it.status.name)
+            when (it.status) {
+                Status.SUCCESS -> {
+                    processNewsUpdate(it.data!!)
+                    changeShimmerRecycler(false)
+                }
+                Status.EMPTY -> showErrorLayout(getString(R.string.error_header_empty), getString(R.string.error_empty))
+                Status.LOADING -> changeShimmerRecycler(true)
+                Status.ERROR -> showErrorLayout(getString(R.string.error_header), it.message.toString())
+            }
         })
 
         postRecyclerView.apply {
@@ -66,9 +75,61 @@ class NewsFragment : Fragment() {
         swipeRefreshLayout.setOnRefreshListener {
             postViewModel.getPosts()
             swipeRefreshLayout.isRefreshing = false
+            shouldScrollToStart = true
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnPostLikeListener) {
+            newsFragmentListener = context
+        }
+    }
+
+    private fun changeShimmerRecycler(show: Boolean) {
+        shimmerLayout.isShimmering = show
+        postRecyclerView.isVisible = !show
+        swipeRefreshLayout.isEnabled = !show
+        errorLayout.isVisible = false
+    }
+
+    private fun processNewsUpdate(list: List<PostItem>) {
+        val favoritePostList = list.toMutableList().filter { postItem -> postItem.isFavorite }
+        val isFavorite = requireArguments().getBoolean(FAVORITE_ONLY)
+        postAdapter.list = if (isFavorite) favoritePostList else list
+        if (shouldScrollToStart) {
             postRecyclerView.post {
                 postRecyclerView.scrollToPosition(0)
+                shouldScrollToStart = false
             }
+        }
+        newsFragmentListener?.onFavoriteVisibility(favoritePostList.isNotEmpty())
+    }
+
+    private fun showErrorLayout(errorHeader: String, error: String){
+        shimmerLayout.isShimmering = false
+        errorLayout.isVisible = true
+        swipeRefreshLayout.isEnabled = true
+        errorText.text = error
+        errorHeaderText.text = errorHeader
+        newsFragmentListener?.onFavoriteVisibility(false)
+    }
+
+    /* задание из обязательной части
+    private fun showErrorDialog(error: String) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.error_header)
+            .setMessage(error)
+            .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    } */
+
+    private fun prepareDetailOptions(position: Int, postItem: PostItem) {
+        val viewHolder = postRecyclerView.findViewHolderForAdapterPosition(position)
+        if (viewHolder != null) {
+            startDetailsActivity(viewHolder, postItem)
         }
     }
 
@@ -96,18 +157,10 @@ class NewsFragment : Fragment() {
                 viewHolder.itemView.postTimeText.transitionName
             )
         )
-        activity?.startActivity(
-            Intent(context, PostDetailsActivity::class.java)
-                .putExtra(PostDetailsActivity.POST_EXTRA, postItem),
+        requireActivity().startActivity(
+            PostDetailsActivity.createIntent(requireContext(), postItem),
             options.toBundle()
         )
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnPostLikeListener) {
-            newsFragmentListener = context
-        }
     }
 
     interface OnPostLikeListener {

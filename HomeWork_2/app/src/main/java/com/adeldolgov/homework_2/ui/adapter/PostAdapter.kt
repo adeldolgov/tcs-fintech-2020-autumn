@@ -1,9 +1,10 @@
 package com.adeldolgov.homework_2.ui.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.adeldolgov.homework_2.R
 import com.adeldolgov.homework_2.data.item.PostItem
@@ -15,6 +16,10 @@ import com.adeldolgov.homework_2.util.imageloader.GlideImageLoader
 import com.adeldolgov.homework_2.util.imageloader.ImageLoader
 import com.adeldolgov.homework_2.util.toRelativeDateString
 import com.adeldolgov.homework_2.util.toRelativeDateStringDay
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.view_social_post.view.*
 import java.util.*
 
@@ -28,48 +33,60 @@ class PostAdapter(
 ) : RecyclerView.Adapter<PostAdapter.BaseViewHolder>(),
     SwipeItemTouchHelperCallback.SwipeItemTouchHelperAdapter, DateItemDecoration.DateItemInterface {
 
-    private val diffUtil = AsyncListDiffer(this, PostDiffUtilsCallback())
     private val imageLoader: ImageLoader = GlideImageLoader()
-
+    private var diffDisposable: Disposable? = null
     var list: List<PostItem> = emptyList()
         set(value) {
-            diffUtil.submitList(value)
-            field = value
+            diffDisposable = calculateDiffs(field, value).subscribe(
+                {
+                    it.dispatchUpdatesTo(this)
+                    field = value
+                },
+                { Log.d(PostAdapter::class.java.name, it.message?:"Trowed error at diff calculations") }
+            )
         }
-        get() = diffUtil.currentList
 
     override fun getItemViewType(position: Int): Int {
-        return if(list[position].attachments?.get(0)?.photo?.sizes?.size != null) POST_IMAGE else POST_TEXT_ONLY
+        val photosSize = list[position].attachments?.first()?.photo?.sizes?.size
+        return if (photosSize != null) POST_IMAGE else POST_TEXT_ONLY
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            POST_IMAGE -> {
-                PostWithImageViewHolder(inflater.inflate(R.layout.item_post, parent, false),
-                    clickLikeListener = {
-                        swipeLeftListener(list[it])
-                    },
-                    clickListener = {
-                        onClickListener(it, list[it])
-                    },
-                    imageLoader = imageLoader)
-            }
-            else -> {
-                PostViewHolder(inflater.inflate(R.layout.item_post, parent, false),
-                    clickLikeListener = {
-                        swipeLeftListener(list[it])
-                    },
-                    clickListener = {
-                        onClickListener(it, list[it])
-                    },
-                    imageLoader = imageLoader)
-            }
+            POST_IMAGE -> createWithImageVH(inflater, parent)
+            else -> createWithTextVH(inflater, parent)
         }
     }
 
+    private fun createWithTextVH(inflater: LayoutInflater, parent: ViewGroup): PostViewHolder {
+        return PostViewHolder(
+            inflater.inflate(R.layout.item_post, parent, false),
+            clickLikeListener = {
+                swipeLeftListener(list[it])
+            },
+            clickListener = {
+                onClickListener(it, list[it])
+            },
+            imageLoader = imageLoader
+        )
+    }
+
+    private fun createWithImageVH(inflater: LayoutInflater, parent: ViewGroup): PostWithImageViewHolder {
+        return PostWithImageViewHolder(
+            inflater.inflate(R.layout.item_post, parent, false),
+            clickLikeListener = {
+                swipeLeftListener(list[it])
+            },
+            clickListener = {
+                onClickListener(it, list[it])
+            },
+            imageLoader = imageLoader
+        )
+    }
+
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        when(holder) {
+        when (holder) {
             is PostViewHolder -> holder.bind(list[position])
             is PostWithImageViewHolder -> holder.bind(list[position])
             else -> holder.bind(list[position])
@@ -102,6 +119,17 @@ class PostAdapter(
         return list[position].date.toRelativeDateStringDay()
     }
 
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        diffDisposable?.dispose()
+    }
+
+    private fun calculateDiffs(oldList: List<PostItem>, newList: List<PostItem>): Single<DiffUtil.DiffResult> {
+        return Single.fromCallable { DiffUtil.calculateDiff(PostDiffUtilsCallback(oldList, newList)) }
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     abstract class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bind(post: PostItem)
     }
@@ -116,9 +144,13 @@ class PostAdapter(
             itemView.postLikeBtn.setOnClickListener { clickLikeListener(adapterPosition) }
             itemView.setOnClickListener { clickListener(adapterPosition) }
         }
+
         override fun bind(post: PostItem) {
             with(itemView) {
-                imageLoader.loadPoster(post.attachments?.get(0)?.photo?.sizes?.get(0)!!, postContentImage)
+                imageLoader.loadPoster(
+                    post.attachments?.first()?.photo?.sizes?.first()!!,
+                    postContentImage
+                )
                 imageLoader.loadRoundedAvatar(post.sourceImage, postOwnerImage)
 
                 postContentText.text = post.text
@@ -147,6 +179,7 @@ class PostAdapter(
             itemView.postLikeBtn.setOnClickListener { clickLikeListener(adapterPosition) }
             itemView.setOnClickListener { clickListener(adapterPosition) }
         }
+
         override fun bind(post: PostItem) {
             with(itemView) {
                 imageLoader.loadRoundedAvatar(post.sourceImage, postOwnerImage)
