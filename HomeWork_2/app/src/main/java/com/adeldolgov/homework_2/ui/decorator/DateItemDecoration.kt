@@ -17,9 +17,14 @@ class DateItemDecoration(private val dateItemInterface: DateItemInterface) : Rec
 
     private val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
     private var roundRectanglePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private var roundRectangleRadius = 20f
     private val textBounds: Rect = Rect()
 
+    companion object {
+        const val PADDING_TOP_DATE = 40
+        const val PADDING_DEFAULT = 4
+        const val DATE_TEXT_SIZE = 16
+        const val ROUND_RECTANGLE_RADIUS = 20f
+    }
 
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         super.onDraw(canvas, parent, state)
@@ -31,7 +36,7 @@ class DateItemDecoration(private val dateItemInterface: DateItemInterface) : Rec
                 val currentRelativeDateStr = dateItemInterface.getDateAtPosition(currentPos)
 
                 textPaint.color = Color.WHITE
-                textPaint.textSize = (16.sp.toFloat())
+                textPaint.textSize = (DATE_TEXT_SIZE.sp.toFloat())
                 textPaint.getTextBounds(currentRelativeDateStr, 0, currentRelativeDateStr.length, textBounds)
 
                 roundRectanglePaint.color = ContextCompat.getColor(parent.context, R.color.colorAccent)
@@ -41,8 +46,8 @@ class DateItemDecoration(private val dateItemInterface: DateItemInterface) : Rec
                     child.top.toFloat() - 32.dp,
                     (parent.measuredWidth / 2 + textBounds.width() / 2 + 12.dp).toFloat(),
                     child.top.toFloat() - 8.dp,
-                    roundRectangleRadius,
-                    roundRectangleRadius,
+                    ROUND_RECTANGLE_RADIUS,
+                    ROUND_RECTANGLE_RADIUS,
                     roundRectanglePaint)
 
                 canvas.drawText(
@@ -60,11 +65,11 @@ class DateItemDecoration(private val dateItemInterface: DateItemInterface) : Rec
         if (currentPos == -1) return
 
         if (dateItemInterface.shouldWriteDate(currentPos)) {
-            outRect.top = 40.dp
+            outRect.top = PADDING_TOP_DATE.dp
         } else {
-            outRect.top = 4.dp
+            outRect.top = PADDING_DEFAULT.dp
         }
-        if (currentPos == (parent.adapter?.itemCount ?: 1) - 1) outRect.bottom = 4.dp
+        if (currentPos == (parent.adapter?.itemCount ?: 1) - 1) outRect.bottom = PADDING_DEFAULT.dp
     }
 
     interface DateItemInterface {

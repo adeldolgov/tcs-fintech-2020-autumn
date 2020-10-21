@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="com.adeldolgov.homework_2.ui.viewgroup.SocialPostViewGroup">
+    tools:parentTag="com.adeldolgov.homework_2.ui.viewgroup.SocialDetailPostViewGroup">
 
     <TextView
         android:id="@+id/postOwnerText"
@@ -73,25 +73,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         tools:text="375" />
-
-
-    <ImageButton
-        android:id="@+id/postCommentBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="24dp"
-        android:background="?android:selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_comment" />
-
-    <TextView
-        android:id="@+id/postCommentCountText"
-        style="@style/SecondaryTextTheme"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="1dp"
-        tools:text="10" />
 
 
     <ImageButton

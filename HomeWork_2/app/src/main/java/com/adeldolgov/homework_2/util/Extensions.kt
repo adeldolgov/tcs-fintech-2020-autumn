@@ -7,7 +7,7 @@ import java.util.*
 
 fun Long.toRelativeDateString(): String {
     val now = System.currentTimeMillis()
-    return DateUtils.getRelativeTimeSpanString(this * 1000, now, DateUtils.MINUTE_IN_MILLIS,
+    return DateUtils.getRelativeTimeSpanString(this * 1000, now, DateUtils.YEAR_IN_MILLIS,
         DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_DATE).toString()
 }
 
