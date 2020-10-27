@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">HomeWork_2</string>
+    <integer name="com_vk_sdk_AppId">7640396</integer>
+
+    <!-- Login -->
+    <string name="welcome_to_feeder">Добро пожаловать в Feeder. \nВсе ваши новости в одном приложении. :)</string>
+    <string name="login_with">Войти с помощью</string>
+
+
     <!-- Bottom bar menu -->
     <string name="news">Новости</string>
     <string name="favorite">Избранное</string>
@@ -9,7 +16,7 @@
     <string name="error_header">:-(</string>
     <string name="error_header_empty">:-0</string>
     <string name="error_empty">Новости отсутствуют. Обновите их попозже! :-)</string>
-
+    <string name="erro_vk_login">Не удалось войти в аккаунт, пожалуйста, повторите позднее.\nКод ошибки - %d</string>
 
 
 </resources>

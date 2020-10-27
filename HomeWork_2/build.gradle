@@ -36,6 +36,9 @@ ext {
     rxAndroidVersion = '2.1.1'
     rxKotlinVersion = '2.4.0'
     shimmerAndroidVersion = '0.5.0'
+    vkSdkVersion = '2.2.0'
+    retrofitVersion = '2.9.0'
+    retrofitRxAdapterVersion = '2.6.4'
 }
 
 task clean(type: Delete) {

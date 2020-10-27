@@ -6,9 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardPreventCornerOverlap="false"
+    app:cardElevation="4dp"
     android:transitionName="postCard">
 
-    <com.adeldolgov.homework_2.ui.viewgroup.SocialPostViewGroup
+    <com.adeldolgov.feeder.ui.viewgroup.SocialPostViewGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

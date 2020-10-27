@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="com.adeldolgov.homework_2.ui.viewgroup.PlaceHolderSocialPostViewGroup">
+    tools:parentTag="com.adeldolgov.feeder.ui.viewgroup.PlaceHolderSocialPostViewGroup">
 
     <TextView
         android:id="@+id/postOwnerText"
@@ -15,7 +15,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:transitionName="postOwnerText"
-        android:background="#B3B3B3" />
+        android:background="@color/colorShimmerBackground" />
 
     <TextView
         android:id="@+id/postTimeText"
@@ -25,7 +25,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         android:transitionName="postTimeText"
-        android:background="#B3B3B3" />
+        android:background="@color/colorShimmerBackground" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/postOwnerImage"
@@ -34,7 +34,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:transitionName="postOwnerImage"
-        android:background="#B3B3B3"
+        android:background="@color/colorShimmerBackground"
         app:shapeAppearanceOverlay="@style/CircleImageView" />
 
     <TextView
@@ -47,7 +47,7 @@
         android:textSize="16sp"
         android:transitionName="postContentText"
         android:textColor="@android:color/transparent"
-        android:background="#B3B3B3"
+        android:background="@color/colorShimmerBackground"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nCras vitae ex molestie, vulputate nisl vel, placerat dolor. Donec elementum nibh vitae gravida cursus." />
 
     <ImageView
@@ -58,7 +58,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:adjustViewBounds="true"
-        android:background="#B3B3B3"
+        android:background="@color/colorShimmerBackground"
         android:transitionName="postContentImage" />
 
 

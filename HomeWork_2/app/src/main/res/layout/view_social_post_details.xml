@@ -3,14 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="com.adeldolgov.homework_2.ui.viewgroup.SocialDetailPostViewGroup">
+    tools:parentTag="com.adeldolgov.feeder.ui.viewgroup.SocialDetailPostViewGroup">
 
     <TextView
         android:id="@+id/postOwnerText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="middle"
+        android:singleLine="true"
         android:textSize="18sp"
         android:textStyle="bold"
         android:transitionName="postOwnerText"

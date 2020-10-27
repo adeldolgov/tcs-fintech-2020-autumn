@@ -6,7 +6,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        applicationId "com.adeldolgov.homework_2"
+        applicationId "com.adeldolgov.feeder"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
@@ -60,6 +60,12 @@ dependencies {
     //Shimmer-Android
     implementation "com.facebook.shimmer:shimmer:$shimmerAndroidVersion"
 
+    //VKSdk
+    implementation "com.vk:androidsdk:$vkSdkVersion"
 
+    //Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitRxAdapterVersion"
 
 }

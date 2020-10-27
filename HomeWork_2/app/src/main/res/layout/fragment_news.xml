@@ -8,8 +8,6 @@
 
     <include layout="@layout/view_social_list_shimmer"/>
 
-    <include layout="@layout/view_error"/>
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
@@ -21,5 +19,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_post"/>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <include layout="@layout/view_error"/>
 
 </FrameLayout>

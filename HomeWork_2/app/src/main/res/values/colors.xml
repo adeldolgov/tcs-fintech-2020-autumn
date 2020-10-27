@@ -6,5 +6,9 @@
     <color name="colorText">#000</color>
     <color name="colorSecondaryText">#8e8e8e</color>
     <color name="colorLike">#D30000</color>
+    <color name="colorShimmerBackground">#B3B3B3</color>
+    <color name="colorVk">#2787f5</color>
+    <color name="colorBackground">#ebedf0</color>
+
 
 </resources>
