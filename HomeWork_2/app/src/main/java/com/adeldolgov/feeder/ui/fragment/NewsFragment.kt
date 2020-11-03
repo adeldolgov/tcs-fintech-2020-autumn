@@ -15,14 +15,14 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.adeldolgov.feeder.R
-import com.adeldolgov.feeder.data.item.PostItem
 import com.adeldolgov.feeder.domain.viewmodel.PostsViewModel
 import com.adeldolgov.feeder.ui.activity.PostDetailsActivity
 import com.adeldolgov.feeder.ui.adapter.PostAdapter
 import com.adeldolgov.feeder.ui.decorator.DateItemDecoration
+import com.adeldolgov.feeder.ui.item.PostItem
 import com.adeldolgov.feeder.ui.itemtouchhelper.SwipeItemTouchHelperCallback
 import com.adeldolgov.feeder.util.Resource
-import com.adeldolgov.feeder.util.isShimmering
+import com.adeldolgov.feeder.util.extension.isShimmering
 import kotlinx.android.synthetic.main.fragment_news.*
 import kotlinx.android.synthetic.main.view_error.*
 import kotlinx.android.synthetic.main.view_social_list_shimmer.*
@@ -42,7 +42,7 @@ class NewsFragment : Fragment() {
     private val postAdapter = PostAdapter(
         { postViewModel.changePostLike(it) },
         { postViewModel.ignorePost(it) },
-        { position, postItem -> prepareDetailOptions(position, postItem) })
+        { position, postItem -> prepareDetailOptionsAndStartDetailsActivity(position, postItem) })
     private var shouldScrollToStart = false
     private var newsFragmentListener: OnPostLikeListener? = null
 
@@ -55,12 +55,21 @@ class NewsFragment : Fragment() {
         postViewModel.postList.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Resource.Success -> {
-                    processNewsUpdate(it.data)
-                    showShimmerRecycler(false)
+                    showLoadingScreen(false)
+                    updateRecyclerAdapterPostsAndScrollToStart(it.data)
                 }
-                is Resource.Empty -> showErrorLayout(getString(R.string.error_header_empty), getString(R.string.error_empty))
-                is Resource.Loading -> showShimmerRecycler(true)
-                is Resource.Failure -> showErrorLayout(getString(R.string.error_header), it.message)
+                is Resource.Empty -> {
+                    showLoadingScreen(false)
+                    showErrorScreenWithContent(getString(R.string.error_header_empty), getString(R.string.error_empty))
+                }
+                is Resource.Loading -> {
+                    hideErrorScreen()
+                    showLoadingScreen(true)
+                }
+                is Resource.Failure -> {
+                    showLoadingScreen(false)
+                    showErrorScreenWithContent(getString(R.string.error_header), it.message)
+                }
             }
         })
 
@@ -71,9 +80,9 @@ class NewsFragment : Fragment() {
         }
 
         swipeRefreshLayout.setOnRefreshListener {
-            postViewModel.getPosts()
-            swipeRefreshLayout.isRefreshing = false
             shouldScrollToStart = true
+            postViewModel.getPosts(true)
+            swipeRefreshLayout.isRefreshing = false
         }
     }
 
@@ -84,14 +93,25 @@ class NewsFragment : Fragment() {
         }
     }
 
-    private fun showShimmerRecycler(show: Boolean) {
-        shimmerLayout.isShimmering = show
+    private fun showLoadingScreen(show: Boolean) {
         postRecyclerView.isVisible = !show
+        shimmerLayout.isShimmering = show
         swipeRefreshLayout.isEnabled = !show
+    }
+
+    private fun showErrorScreenWithContent(errorHeader: String, error: String){
+        postRecyclerView.isVisible = false
+        errorLayout.isVisible = true
+        errorText.text = error
+        errorHeaderText.text = errorHeader
+        newsFragmentListener?.onFavoriteVisibility(false)
+    }
+
+    private fun hideErrorScreen() {
         errorLayout.isVisible = false
     }
 
-    private fun processNewsUpdate(posts: List<PostItem>) {
+    private fun updateRecyclerAdapterPostsAndScrollToStart(posts: List<PostItem>) {
         val favoritePosts = posts.toMutableList().filter { postItem -> postItem.hasUserLike }
         val isFavorite = requireArguments().getBoolean(FAVORITE_ONLY)
         postAdapter.posts = if (isFavorite) favoritePosts else posts
@@ -104,17 +124,7 @@ class NewsFragment : Fragment() {
         newsFragmentListener?.onFavoriteVisibility(favoritePosts.isNotEmpty())
     }
 
-    private fun showErrorLayout(errorHeader: String, error: String){
-        shimmerLayout.isShimmering = false
-        swipeRefreshLayout.isEnabled = true
-        errorLayout.isVisible = true
-        postRecyclerView.isVisible = false
-        errorText.text = error
-        errorHeaderText.text = errorHeader
-        newsFragmentListener?.onFavoriteVisibility(false)
-    }
-
-    private fun prepareDetailOptions(position: Int, postItem: PostItem) {
+    private fun prepareDetailOptionsAndStartDetailsActivity(position: Int, postItem: PostItem) {
         val viewHolder = postRecyclerView.findViewHolderForAdapterPosition(position)
         if (viewHolder != null) {
             startDetailsActivity(viewHolder, postItem)

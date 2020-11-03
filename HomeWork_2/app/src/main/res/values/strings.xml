@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HomeWork_2</string>
+    <string name="app_name">Feeder</string>
     <integer name="com_vk_sdk_AppId">7640396</integer>
 
     <!-- Login -->
@@ -11,12 +11,24 @@
     <string name="news">Новости</string>
     <string name="favorite">Избранное</string>
 
+    <!-- Image details -->
+    <string name="save">Сохранить</string>
+    <string name="share">Поделиться</string>
+    <string name="details_watch">Детальный просмотр</string>
+    <string name="success_save_picture">Фотография успешно сохранена.</string>
+
+    <!-- Permissions -->
+    <string name="permission_storage">Пожалуйста, предоставьте доступ к хранилищу для того чтобы продолжить.</string>
+
     <!-- Error -->
     <string name="error_dialog_header">Ошибка</string>
     <string name="error_header">:-(</string>
     <string name="error_header_empty">:-0</string>
     <string name="error_empty">Новости отсутствуют. Обновите их попозже! :-)</string>
-    <string name="erro_vk_login">Не удалось войти в аккаунт, пожалуйста, повторите позднее.\nКод ошибки - %d</string>
+    <string name="error_vk_login">Не удалось войти в аккаунт, пожалуйста, повторите позднее.\nКод ошибки - %d</string>
+    <string name="error_image_loading">Произошла ошибка при загрузке фото. Повторите позднее.</string>
+    <string name="error_save_picture">Не удалось сохранить фотографию.</string>
+
 
 
 </resources>

@@ -3,6 +3,8 @@
     package="com.adeldolgov.feeder">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
 
     <application
         android:name=".FeederApp"
@@ -24,7 +26,19 @@
             android:name=".ui.activity.ImageDetailsActivity"
             android:theme="@style/AppTheme.ImageViewerTheme">
         </activity>
-        <activity android:name=".ui.activity.PostDetailsActivity" />
+        <activity
+            android:label="@string/details_watch"
+            android:name=".ui.activity.PostDetailsActivity">
+        </activity>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.adeldolgov.feeder"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
     </application>
 
 </manifest>

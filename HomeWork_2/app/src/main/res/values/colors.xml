@@ -8,7 +8,6 @@
     <color name="colorLike">#D30000</color>
     <color name="colorShimmerBackground">#B3B3B3</color>
     <color name="colorVk">#2787f5</color>
-    <color name="colorBackground">#ebedf0</color>
-
-
+    <color name="colorBackground">#fff</color>
+    <color name="colorSemiTransparent">#AA000000</color>
 </resources>

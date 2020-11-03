@@ -1,6 +1,8 @@
 package com.adeldolgov.feeder.ui.viewgroup
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
@@ -13,9 +15,9 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.adeldolgov.feeder.R
-import com.adeldolgov.feeder.data.item.PostItem
+import com.adeldolgov.feeder.ui.item.PostItem
+import com.adeldolgov.feeder.util.extension.toRelativeDateString
 import com.adeldolgov.feeder.util.imageloader.ImageLoader
-import com.adeldolgov.feeder.util.toRelativeDateString
 import kotlinx.android.synthetic.main.view_social_post.view.*
 import kotlin.math.max
 
@@ -161,13 +163,23 @@ class SocialDetailPostViewGroup @JvmOverloads constructor(
 
     override fun generateDefaultLayoutParams() = MarginLayoutParams(WRAP_CONTENT, WRAP_CONTENT)
 
-    fun setPostDetails(postItem: PostItem, imageLoader: ImageLoader, onImageClickListener: (String) -> Unit) {
-        postItem.attachments?.get(0)?.photo?.sizes?.last()?.url?.let { url ->
+    fun setPostDetails(
+        postItem: PostItem, imageLoader: ImageLoader,
+        onImageClickListener: (String) -> Unit,
+        onShareClickListener: (Bitmap?) -> Unit
+    ) {
+        postItem.attachments?.first()?.photo?.sizes?.last()?.url?.let { url ->
             imageLoader.loadPoster(url, postContentImage)
             postContentImage.setOnClickListener {
                 onImageClickListener(url)
             }
         }
+
+        postShareBtn.setOnClickListener {
+            val bitmap = (postContentImage.drawable as BitmapDrawable?)?.bitmap
+            onShareClickListener(bitmap)
+        }
+
         imageLoader.loadRoundedAvatar(postItem.sourceImage, postOwnerImage)
 
         postContentText.text = postItem.text

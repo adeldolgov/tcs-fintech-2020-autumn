@@ -10,8 +10,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import com.adeldolgov.feeder.R
-import com.adeldolgov.feeder.util.dp
-import com.adeldolgov.feeder.util.sp
+import com.adeldolgov.feeder.util.extension.dp
+import com.adeldolgov.feeder.util.extension.sp
 
 class DateItemDecoration(private val dateItemInterface: DateItemInterface) : RecyclerView.ItemDecoration() {
 

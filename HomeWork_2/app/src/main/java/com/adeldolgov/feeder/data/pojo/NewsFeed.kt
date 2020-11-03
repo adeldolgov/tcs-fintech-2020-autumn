@@ -6,7 +6,7 @@ class NewsFeed(
     @SerializedName("items")
     val items: List<Post>,
     @SerializedName("profiles")
-    val profiles: List<Source>,
+    val profiles: List<Profile>,
     @SerializedName("groups")
     val groups: List<Source>,
     @SerializedName("next_from")

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path
+        name="external_pictures"
+        path=".Pictures/Feeder" />
+    <cache-path
+        name="shared_images"
+        path="images/shared"/>
+</paths>

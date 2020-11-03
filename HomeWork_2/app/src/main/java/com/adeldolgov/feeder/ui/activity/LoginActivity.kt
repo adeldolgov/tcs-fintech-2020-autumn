@@ -5,8 +5,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.adeldolgov.feeder.R
 import com.adeldolgov.feeder.util.ApplicationPreferences
-import com.adeldolgov.feeder.util.feederApp
-import com.adeldolgov.feeder.util.toast
+import com.adeldolgov.feeder.util.extension.feederApp
+import com.adeldolgov.feeder.util.extension.toast
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.auth.VKAccessToken
 import com.vk.api.sdk.auth.VKAuthCallback
@@ -20,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
 
         if (VK.isLoggedIn()) {
             feederApp().setVKTokenForSession(ApplicationPreferences(this).getVKToken())
-            startMainActivity()
+            startMainActivityAndFinishThis()
         }
         vkLoginBtn.setOnClickListener {
             VK.login(this, arrayListOf(VKScope.WALL, VKScope.PHOTOS, VKScope.FRIENDS))
@@ -32,11 +32,11 @@ class LoginActivity : AppCompatActivity() {
             override fun onLogin(token: VKAccessToken) {
                 ApplicationPreferences(this@LoginActivity).setVKToken(token.accessToken)
                 feederApp().setVKTokenForSession(token.accessToken)
-                startMainActivity()
+                startMainActivityAndFinishThis()
             }
 
             override fun onLoginFailed(errorCode: Int) {
-                this@LoginActivity.toast(getString(R.string.erro_vk_login, errorCode))
+                this@LoginActivity.toast(getString(R.string.error_vk_login, errorCode))
             }
         }
         if (data == null || !VK.onActivityResult(requestCode, resultCode, data, callback)) {
@@ -44,7 +44,8 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun startMainActivity() {
+    private fun startMainActivityAndFinishThis() {
         startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 }

@@ -1,13 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/black"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ImageView
+    <com.jsibbold.zoomage.ZoomageView
         android:id="@+id/detailsImage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:transitionName="postContentImage"
-        android:layout_gravity="center"/>
+        android:layout_height="match_parent"
+        android:transitionName="postContentImage" />
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_gravity="top"
+        android:backgroundTint="@color/colorSemiTransparent"
+        android:layout_height="?attr/actionBarSize"
+        app:elevation="0dp">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/appToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"/>
+    </com.google.android.material.appbar.AppBarLayout>
 </FrameLayout>

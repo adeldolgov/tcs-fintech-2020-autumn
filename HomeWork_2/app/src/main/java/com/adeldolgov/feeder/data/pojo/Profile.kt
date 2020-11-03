@@ -2,13 +2,13 @@ package com.adeldolgov.feeder.data.pojo
 
 import com.google.gson.annotations.SerializedName
 
-class Source(
+class Profile(
     @SerializedName("id")
     val id: Long,
-    @SerializedName("type")
-    val type: String,
-    @SerializedName("name")
-    val name: String,
+    @SerializedName("first_name")
+    val firstName: String,
+    @SerializedName("last_name")
+    val lastName: String,
     @SerializedName("photo_100")
     val photo100: String
 )

@@ -2,35 +2,39 @@ package com.adeldolgov.feeder.domain.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.adeldolgov.feeder.data.item.PostItem
+import com.adeldolgov.feeder.data.mapper.toPostItem
 import com.adeldolgov.feeder.data.pojo.Post
 import com.adeldolgov.feeder.data.pojo.Source
-import com.adeldolgov.feeder.data.pojo.toPostItem
 import com.adeldolgov.feeder.data.repository.NewsRepository
+import com.adeldolgov.feeder.ui.item.PostItem
 import com.adeldolgov.feeder.util.Resource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlin.math.absoluteValue
 
 class PostsViewModel: ViewModel()  {
+
+    companion object {
+        private const val ITEMS_COUNT = 50
+        private const val START_FROM = 0
+    }
+
     val postList = MutableLiveData<Resource<List<PostItem>>>()
     private val postRepo = NewsRepository()
     private val compositeDisposable = CompositeDisposable()
 
     init {
-        getPosts()
+        getPosts(false)
     }
 
-    fun getPosts() {
+    fun getPosts(ignoreTimeout: Boolean) {
         compositeDisposable.add(
-            postRepo.getNewsFeedPosts()
-                .doOnSubscribe {
-                    postList.postValue(Resource.Loading(data = null))
-                }
+            postRepo.getNewsFeedPosts(ignoreTimeout, ITEMS_COUNT, START_FROM)
+                .doOnSubscribe { postList.postValue(Resource.Loading(data = null)) }
                 .map {
-                    mapPostsToPostItem(it.items, it.groups.toMutableList()
-                        .apply { addAll(it.profiles) })
+                    mapPostsToPostItem(it.items, it.groups.toMutableList())
                 }
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -45,21 +49,30 @@ class PostsViewModel: ViewModel()  {
         )
     }
 
+    fun changePostLike(postItem: PostItem) {
+        if (!postItem.hasUserLike) addLikeAtPost(postItem) else deleteLikeAtPost(postItem)
+    }
+
+    fun ignorePost(postItem: PostItem) {
+        compositeDisposable.addAll(postRepo.ignorePost(postItem.id, postItem.sourceId)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { removePost(postItem) },
+                onError = { postError(it) }
+            )
+        )
+    }
+
     private fun postError(it: Throwable) {
-        postList.value = Resource.Failure(data = null, message = it.message.toString())
+        postList.value = Resource.Failure(data = null, message = it.message?:"Got error at API request, but error is null")
     }
 
     private fun mapPostsToPostItem(posts: List<Post>, groups: List<Source>): List<PostItem> {
-        posts.filter { post -> post.text.isNotEmpty() || post.attachments?.first()?.photo?.sizes?.size != null }
         return posts.mapNotNull { post ->
-            groups.find { source -> (source.id * -1) == post.sourceId }?.let {
+            groups.find { source -> (source.id == post.sourceId.absoluteValue) }?.let {
                 post.toPostItem(it)
-            }
+            }.takeIf { post.text.isNotEmpty() || post.attachments?.first()?.photo?.sizes?.size != null }
         }
-    }
-
-    fun changePostLike(postItem: PostItem) {
-        if (!postItem.hasUserLike) addLikeAtPost(postItem) else deleteLikeAtPost(postItem)
     }
 
     private fun replaceOldItem(newItem: PostItem, oldItem: PostItem) {
@@ -100,16 +113,6 @@ class PostsViewModel: ViewModel()  {
                         postError(it)
                     }
                 )
-        )
-    }
-
-    fun ignorePost(postItem: PostItem) {
-        compositeDisposable.addAll(postRepo.ignorePost(postItem.id, postItem.sourceId)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { removePost(postItem) },
-                onError = { postError(it) }
-            )
         )
     }
 

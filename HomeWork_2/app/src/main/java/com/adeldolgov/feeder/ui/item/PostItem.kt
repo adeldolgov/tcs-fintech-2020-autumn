@@ -1,4 +1,4 @@
-package com.adeldolgov.feeder.data.item
+package com.adeldolgov.feeder.ui.item
 
 import android.os.Parcelable
 import com.adeldolgov.feeder.data.pojo.Attachment
