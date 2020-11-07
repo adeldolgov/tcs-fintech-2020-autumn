@@ -15,6 +15,7 @@ import com.adeldolgov.feeder.util.timeoutpolicy.PreferencesCacheTimeout
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import java.net.UnknownHostException
 
 class NewsRepository {
 
@@ -22,11 +23,19 @@ class NewsRepository {
     private val appDataBase = AppDatabaseImpl().db
     private val cacheTimeoutPolicy = PreferencesCacheTimeout()
 
-    fun getNewsFeedPosts(ignoreCacheTimeout: Boolean, count: Int, startFrom: Int): Single<NewsFeed> {
+    fun getNewsFeedAtStart(ignoreCacheTimeout: Boolean, count: Int): Single<NewsFeed> {
         return if (FeederApp.isNetworkAvailable && (!cacheTimeoutPolicy.isValid() || ignoreCacheTimeout))
-            loadActualDataFromNetworkAndUpdateLocal(count, startFrom)
+            loadActualDataFromNetworkAndUpdateLocal(count, 0).doOnSubscribe { deleteDataInDatabase() }
         else
-            loadLocalDataFromDatabase(count, startFrom)
+            loadLocalDataFromDatabase()
+    }
+
+    fun fetchNewsFeed(count: Int, startFrom: Int): Single<NewsFeed> {
+        return Single.just(FeederApp.isNetworkAvailable)
+            .map {
+                if (it) loadActualDataFromNetworkAndUpdateLocal(count, startFrom).blockingGet()
+                else throw UnknownHostException()
+            }
     }
 
     fun addLikeAtPost(postId: Long, ownerId: Long): Single<Count> {
@@ -71,22 +80,29 @@ class NewsRepository {
                 if (it.error != null) throw Exception(it.error.errorMsg)
                 else it.response
             }
-            .doOnSuccess { updateNonActualData(it.groups, it.items) }
+            .doOnSuccess { updateDataInDatabase(it.groups, it.items) }
     }
 
-    private fun loadLocalDataFromDatabase(count: Int, startFrom: Int): Single<NewsFeed> {
+    private fun loadLocalDataFromDatabase(): Single<NewsFeed> {
         return getSourcesFromDatabase()
-            .zipWith(getPostsFromDatabase(count, startFrom)) { sources: List<Source>, posts: List<Post> ->
+            .zipWith(getPostsFromDatabase()) { sources: List<Source>, posts: List<Post> ->
                 NewsFeed(posts, emptyList(), sources, "")
             }
     }
 
-    private fun updateNonActualData(sources: List<Source>, posts: List<Post>) {
-        appDataBase.sourceDao().deleteDataFromTable()
-        appDataBase.postDao().deleteDataFromTable()
-        insertSourcesToDatabase(sources)
-        insertPostsToDatabase(posts)
+    private fun updateDataInDatabase(sources: List<Source>, posts: List<Post>) {
+        appDataBase.runInTransaction{
+            insertSourcesToDatabase(sources)
+            insertPostsToDatabase(posts)
+        }
         cacheTimeoutPolicy.setLatestTime(System.currentTimeMillis())
+    }
+
+    private fun deleteDataInDatabase() {
+        appDataBase.runInTransaction{
+            appDataBase.postDao().deleteDataFromTable()
+            appDataBase.sourceDao().deleteDataFromTable()
+        }
     }
 
     private fun insertSourcesToDatabase(sources: List<Source>) {
@@ -101,9 +117,9 @@ class NewsRepository {
         }.toTypedArray())
     }
 
-    private fun getPostsFromDatabase(limit: Int, offset: Int): Single<List<Post>> {
+    private fun getPostsFromDatabase(): Single<List<Post>> {
         return appDataBase.postDao()
-            .getPosts(limit, offset)
+            .getPosts()
             .subscribeOn(Schedulers.io())
             .map { it.map { postEntity -> postEntity.toPost() } }
     }

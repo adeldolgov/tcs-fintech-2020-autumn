@@ -104,8 +104,7 @@ class PostAdapter(
         abstract fun bind(post: PostItem)
     }
 
-    class PostWithImageViewHolder(
-        view: View,
+    class PostWithImageViewHolder(view: View,
         clickLikeListener: (Int) -> Unit,
         clickListener: (Int) -> Unit,
         val imageLoader: ImageLoader

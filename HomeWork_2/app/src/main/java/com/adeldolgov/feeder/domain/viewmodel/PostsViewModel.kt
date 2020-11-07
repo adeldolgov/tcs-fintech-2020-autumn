@@ -10,6 +10,7 @@ import com.adeldolgov.feeder.ui.item.PostItem
 import com.adeldolgov.feeder.util.Resource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlin.math.absoluteValue
@@ -17,11 +18,11 @@ import kotlin.math.absoluteValue
 class PostsViewModel: ViewModel()  {
 
     companion object {
-        private const val ITEMS_COUNT = 50
-        private const val START_FROM = 0
+        private const val ITEMS_COUNT = 25
     }
 
     val postList = MutableLiveData<Resource<List<PostItem>>>()
+    var recyclerViewPageLoading = false
     private val postRepo = NewsRepository()
     private val compositeDisposable = CompositeDisposable()
 
@@ -30,23 +31,45 @@ class PostsViewModel: ViewModel()  {
     }
 
     fun getPosts(ignoreTimeout: Boolean) {
-        compositeDisposable.add(
-            postRepo.getNewsFeedPosts(ignoreTimeout, ITEMS_COUNT, START_FROM)
-                .doOnSubscribe { postList.postValue(Resource.Loading(data = null)) }
-                .map {
-                    mapPostsToPostItem(it.items, it.groups.toMutableList())
-                }
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = {
-                        postList.value = if (it.isNotEmpty()) Resource.Success(data = it) else Resource.Empty()
-                    },
-                    onError = {
-                        postError(it)
+        postRepo.getNewsFeedAtStart(ignoreTimeout, ITEMS_COUNT)
+            .doOnSubscribe { postList.postValue(Resource.Loading(data = null)) }
+            .map {
+                mapPostsToPostItem(it.items, it.groups.toMutableList())
+            }
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    postList.value =
+                        if (it.isNotEmpty()) Resource.Success(data = it) else Resource.Empty()
+                },
+                onError = {
+                    postError(it)
+                })
+            .addTo(compositeDisposable)
+    }
+
+    fun fetchNewPosts() {
+        recyclerViewPageLoading = true
+        val startFrom = postList.value?.data?.size?.plus(1) ?: 0
+        postRepo.fetchNewsFeed(ITEMS_COUNT, startFrom)
+            .map {
+                mapPostsToPostItem(it.items, it.groups.toMutableList())
+            }
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it.isNotEmpty()) postList.value?.data?.let { oldList ->
+                        postList.value = Resource.Success(data = oldList.toMutableList() + it)
                     }
-                )
-        )
+                    recyclerViewPageLoading = false
+                },
+                onError = {
+                    postError(it)
+                }
+            )
+            .addTo(compositeDisposable)
     }
 
     fun changePostLike(postItem: PostItem) {

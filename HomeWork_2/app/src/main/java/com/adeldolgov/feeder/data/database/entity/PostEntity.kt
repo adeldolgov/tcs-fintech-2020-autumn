@@ -10,8 +10,7 @@ import com.adeldolgov.feeder.data.pojo.Attachment
         entity = SourceEntity::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("source_id"),
-        onUpdate = ForeignKey.CASCADE,
-        onDelete = ForeignKey.CASCADE
+        onUpdate = ForeignKey.CASCADE
     )]
 )
 

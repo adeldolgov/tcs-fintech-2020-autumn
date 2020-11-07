@@ -6,6 +6,8 @@
     <string name="welcome_to_feeder">Добро пожаловать в Feeder. \nВсе ваши новости в одном приложении. :)</string>
     <string name="login_with">Войти с помощью</string>
 
+    <!-- NewsFeed -->
+    <string name="repeat">Повторить</string>
 
     <!-- Bottom bar menu -->
     <string name="news">Новости</string>

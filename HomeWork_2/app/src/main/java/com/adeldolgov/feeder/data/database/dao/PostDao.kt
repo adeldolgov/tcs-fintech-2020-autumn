@@ -10,8 +10,8 @@ import io.reactivex.Single
 @Dao
 interface PostDao {
 
-    @Query("SELECT * FROM post ORDER BY date DESC LIMIT :limit OFFSET :offset")
-    fun getPosts(limit: Int, offset: Int): Single<List<PostEntity>>
+    @Query("SELECT * FROM post ORDER BY date DESC")
+    fun getPosts(): Single<List<PostEntity>>
 
     @Query("SELECT * FROM post WHERE id = :id")
     fun getPostById(id: Long): Single<PostEntity>

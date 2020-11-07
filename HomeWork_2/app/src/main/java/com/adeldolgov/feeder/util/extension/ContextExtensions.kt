@@ -23,13 +23,14 @@ fun Context.toast(message: CharSequence) =
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
 fun Context.sharePhotoFile(shareText: String, subjectText: String, uri: Uri) {
-    val sharingIntent = Intent(Intent.ACTION_SEND)
-    sharingIntent.type = "image/png"
-    sharingIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    sharingIntent.putExtra(Intent.EXTRA_SUBJECT, subjectText)
-    sharingIntent.putExtra(Intent.EXTRA_TEXT, shareText)
-    sharingIntent.putExtra(Intent.EXTRA_STREAM, uri)
+    val sharingIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/png"
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        putExtra(Intent.EXTRA_SUBJECT, subjectText)
+        putExtra(Intent.EXTRA_TEXT, shareText)
+        putExtra(Intent.EXTRA_STREAM, uri)
+    }
     startActivity(
         Intent.createChooser(sharingIntent, subjectText)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -37,11 +38,12 @@ fun Context.sharePhotoFile(shareText: String, subjectText: String, uri: Uri) {
 }
 
 fun Context.sharePhotoFile(shareText: String, uri: Uri) {
-    val sharingIntent = Intent(Intent.ACTION_SEND)
-    sharingIntent.type = "image/png"
-    sharingIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    sharingIntent.putExtra(Intent.EXTRA_STREAM, uri)
+    val sharingIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/png"
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        putExtra(Intent.EXTRA_STREAM, uri)
+    }
     startActivity(
         Intent.createChooser(sharingIntent, shareText)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -49,11 +51,12 @@ fun Context.sharePhotoFile(shareText: String, uri: Uri) {
 }
 
 fun Context.shareTextMessage(shareText: String, subjectText: String) {
-    val sharingIntent = Intent(Intent.ACTION_SEND)
-    sharingIntent.type = "text/plain"
-    sharingIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    sharingIntent.putExtra(Intent.EXTRA_SUBJECT, subjectText)
-    sharingIntent.putExtra(Intent.EXTRA_TEXT, shareText)
+    val sharingIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        putExtra(Intent.EXTRA_SUBJECT, subjectText)
+        putExtra(Intent.EXTRA_TEXT, shareText)
+    }
     startActivity(
         Intent.createChooser(sharingIntent, subjectText)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -74,13 +77,14 @@ fun Context.saveImageToCache(bitmap: Bitmap): Uri {
 }
 
 fun Context.saveImageFileToPictures(file: File): Uri? {
-    val values = ContentValues()
-    values.put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
-    values.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-    values.put(MediaStore.MediaColumns.SIZE, file.length())
-    values.put(MediaStore.MediaColumns.DATE_ADDED, file.lastModified().toRelativeDateString())
-
+    val values = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
+        put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+        put(MediaStore.MediaColumns.SIZE, file.length())
+        put(MediaStore.MediaColumns.DATE_ADDED, file.lastModified().toRelativeDateString())
+    }
     val uri: Uri?
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         val relativeLocation = Environment.DIRECTORY_PICTURES + File.pathSeparator + getString(R.string.app_name)
         values.put(MediaStore.MediaColumns.RELATIVE_PATH, relativeLocation)

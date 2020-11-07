@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.adeldolgov.feeder.R
 import com.adeldolgov.feeder.domain.viewmodel.PostsViewModel
@@ -21,6 +22,7 @@ import com.adeldolgov.feeder.ui.adapter.PostAdapter
 import com.adeldolgov.feeder.ui.decorator.DateItemDecoration
 import com.adeldolgov.feeder.ui.item.PostItem
 import com.adeldolgov.feeder.ui.itemtouchhelper.SwipeItemTouchHelperCallback
+import com.adeldolgov.feeder.ui.onscrolllistener.PaginationListener
 import com.adeldolgov.feeder.util.Resource
 import com.adeldolgov.feeder.util.extension.isShimmering
 import kotlinx.android.synthetic.main.fragment_news.*
@@ -77,6 +79,11 @@ class NewsFragment : Fragment() {
             adapter = postAdapter
             ItemTouchHelper(SwipeItemTouchHelperCallback(postAdapter)).attachToRecyclerView(this)
             addItemDecoration(DateItemDecoration(postAdapter))
+            addOnScrollListener(object : PaginationListener(layoutManager as LinearLayoutManager) {
+                override fun loadMoreItems() = postViewModel.fetchNewPosts()
+                override val isLastPage: Boolean = false
+                override fun isLoading(): Boolean = postViewModel.recyclerViewPageLoading
+            })
         }
 
         swipeRefreshLayout.setOnRefreshListener {

@@ -66,11 +66,6 @@ dependencies {
     implementation "androidx.room:room-rxjava2:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
 
-    //Paging Library
-    implementation "androidx.paging:paging-runtime:$pagingVersion"
-    implementation "androidx.paging:paging-rxjava2:$pagingVersion"
-
-
     //Shimmer-Android
     implementation "com.facebook.shimmer:shimmer:$shimmerAndroidVersion"
 
@@ -81,6 +76,5 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitRxAdapterVersion"
-
 
 }
