@@ -1,7 +1,7 @@
 package com.adeldolgov.feeder.data.repository
 
 import com.adeldolgov.feeder.FeederApp
-import com.adeldolgov.feeder.data.database.AppDatabaseImpl
+import com.adeldolgov.feeder.data.database.AppDatabase
 import com.adeldolgov.feeder.data.mapper.toPost
 import com.adeldolgov.feeder.data.mapper.toPostEntity
 import com.adeldolgov.feeder.data.mapper.toSource
@@ -10,18 +10,19 @@ import com.adeldolgov.feeder.data.pojo.Count
 import com.adeldolgov.feeder.data.pojo.NewsFeed
 import com.adeldolgov.feeder.data.pojo.Post
 import com.adeldolgov.feeder.data.pojo.Source
-import com.adeldolgov.feeder.data.server.VKServiceImpl
-import com.adeldolgov.feeder.util.timeoutpolicy.PreferencesCacheTimeout
+import com.adeldolgov.feeder.data.server.VKService
+import com.adeldolgov.feeder.util.timeoutpolicy.CacheTimeoutPolicy
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import java.net.UnknownHostException
 
-class NewsRepository {
+class NewsRepository(
+    private val vkService: VKService,
+    private val appDatabase: AppDatabase,
+    private val cacheTimeoutPolicy: CacheTimeoutPolicy
+) {
 
-    private val vkService = VKServiceImpl().vkService
-    private val appDataBase = AppDatabaseImpl().db
-    private val cacheTimeoutPolicy = PreferencesCacheTimeout()
 
     fun getNewsFeedAtStart(ignoreCacheTimeout: Boolean, count: Int): Single<NewsFeed> {
         return if (FeederApp.isNetworkAvailable && (!cacheTimeoutPolicy.isValid() || ignoreCacheTimeout))
@@ -43,10 +44,9 @@ class NewsRepository {
             .addLikeAtPost(postId, ownerId)
             .subscribeOn(Schedulers.io())
             .map {
-                if (it.error != null) throw Exception(it.error.errorMsg)
-                else it.response
+                if (it.error != null) throw Exception(it.error.errorMsg) else it.response
             }
-            .doOnSuccess { appDataBase.postDao().updatePostLike(postId, true, it.likes) }
+            .doOnSuccess { appDatabase.postDao().updatePostLike(postId, true, it.likes) }
 
     }
 
@@ -55,10 +55,9 @@ class NewsRepository {
             .deleteLikeAtPost(postId, ownerId)
             .subscribeOn(Schedulers.io())
             .map {
-                if (it.error != null) throw Exception(it.error.errorMsg)
-                else it.response
+                if (it.error != null) throw Exception(it.error.errorMsg) else it.response
             }
-            .doOnSuccess { appDataBase.postDao().updatePostLike(postId, false, it.likes) }
+            .doOnSuccess { appDatabase.postDao().updatePostLike(postId, false, it.likes) }
     }
 
     fun ignorePost(postId: Long, ownerId: Long): Single<Int> {
@@ -66,10 +65,9 @@ class NewsRepository {
             .ignorePost(postId, ownerId)
             .subscribeOn(Schedulers.io())
             .map {
-                if (it.error != null) throw Exception(it.error.errorMsg)
-                else it.response
+                if (it.error != null) throw Exception(it.error.errorMsg) else it.response
             }
-            .doOnSuccess { appDataBase.postDao().deletePostById(postId) }
+            .doOnSuccess { appDatabase.postDao().deletePostById(postId) }
     }
 
     private fun loadActualDataFromNetworkAndUpdateLocal(count: Int, startFrom: Int): Single<NewsFeed> {
@@ -77,11 +75,15 @@ class NewsRepository {
             .getNewsFeedPosts(count, startFrom)
             .subscribeOn(Schedulers.io())
             .map {
-                if (it.error != null) throw Exception(it.error.errorMsg)
-                else it.response
+                if (it.error != null) throw Exception(it.error.errorMsg) else it.response
             }
+            .map { filterPostsFromGroup(it) }
             .doOnSuccess { updateDataInDatabase(it.groups, it.items) }
     }
+
+    //source_id > 0 - user profile, source_id < 0 - group
+    private fun filterPostsFromGroup(it: NewsFeed) =
+        it.copy(items = it.items.filter { post -> post.sourceId < 0 })
 
     private fun loadLocalDataFromDatabase(): Single<NewsFeed> {
         return getSourcesFromDatabase()
@@ -91,41 +93,41 @@ class NewsRepository {
     }
 
     private fun updateDataInDatabase(sources: List<Source>, posts: List<Post>) {
-        appDataBase.runInTransaction{
+        appDatabase.runInTransaction{
             insertSourcesToDatabase(sources)
             insertPostsToDatabase(posts)
+            cacheTimeoutPolicy.setLatestTime(System.currentTimeMillis())
         }
-        cacheTimeoutPolicy.setLatestTime(System.currentTimeMillis())
     }
 
     private fun deleteDataInDatabase() {
-        appDataBase.runInTransaction{
-            appDataBase.postDao().deleteDataFromTable()
-            appDataBase.sourceDao().deleteDataFromTable()
+        appDatabase.runInTransaction{
+            appDatabase.postDao().deleteDataFromTable()
+            appDatabase.sourceDao().deleteDataFromTable()
         }
     }
 
     private fun insertSourcesToDatabase(sources: List<Source>) {
-        appDataBase.sourceDao().insertAll(*sources.map {
+        appDatabase.sourceDao().insertAll(*sources.map {
             it.toSourceEntity()
         }.toTypedArray())
     }
 
     private fun insertPostsToDatabase(posts: List<Post>) {
-        appDataBase.postDao().insertAll(*posts.map {
+        appDatabase.postDao().insertAll(*posts.map {
             it.toPostEntity()
         }.toTypedArray())
     }
 
     private fun getPostsFromDatabase(): Single<List<Post>> {
-        return appDataBase.postDao()
+        return appDatabase.postDao()
             .getPosts()
             .subscribeOn(Schedulers.io())
             .map { it.map { postEntity -> postEntity.toPost() } }
     }
 
     private fun getSourcesFromDatabase(): Single<List<Source>> {
-        return appDataBase.sourceDao()
+        return appDatabase.sourceDao()
             .getSources()
             .subscribeOn(Schedulers.io())
             .map { it.map { sourceEntity -> sourceEntity.toSource() } }

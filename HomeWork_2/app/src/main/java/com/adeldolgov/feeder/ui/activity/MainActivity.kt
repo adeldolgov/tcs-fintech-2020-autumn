@@ -1,5 +1,7 @@
 package com.adeldolgov.feeder.ui.activity
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -10,6 +12,12 @@ import com.adeldolgov.feeder.ui.fragment.NewsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(R.layout.activity_main), NewsFragment.OnPostLikeListener {
+
+    companion object {
+        fun createIntent(context: Context): Intent {
+            return Intent(context, MainActivity::class.java)
+        }
+    }
 
     private var postViewModel: PostsViewModel? = null
 

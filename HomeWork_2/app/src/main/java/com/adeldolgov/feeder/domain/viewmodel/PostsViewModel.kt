@@ -2,12 +2,15 @@ package com.adeldolgov.feeder.domain.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.adeldolgov.feeder.data.database.AppDatabaseImpl
 import com.adeldolgov.feeder.data.mapper.toPostItem
 import com.adeldolgov.feeder.data.pojo.Post
 import com.adeldolgov.feeder.data.pojo.Source
 import com.adeldolgov.feeder.data.repository.NewsRepository
+import com.adeldolgov.feeder.data.server.VKServiceImpl
 import com.adeldolgov.feeder.ui.item.PostItem
 import com.adeldolgov.feeder.util.Resource
+import com.adeldolgov.feeder.util.timeoutpolicy.PreferencesCacheTimeout
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -23,7 +26,12 @@ class PostsViewModel: ViewModel()  {
 
     val postList = MutableLiveData<Resource<List<PostItem>>>()
     var recyclerViewPageLoading = false
-    private val postRepo = NewsRepository()
+
+    private val vkService = VKServiceImpl().vkService
+    private val appDataBase = AppDatabaseImpl().db
+    private val cacheTimeoutPolicy = PreferencesCacheTimeout()
+
+    private val postRepo = NewsRepository(vkService, appDataBase, cacheTimeoutPolicy)
     private val compositeDisposable = CompositeDisposable()
 
     init {
@@ -34,7 +42,7 @@ class PostsViewModel: ViewModel()  {
         postRepo.getNewsFeedAtStart(ignoreTimeout, ITEMS_COUNT)
             .doOnSubscribe { postList.postValue(Resource.Loading(data = null)) }
             .map {
-                mapPostsToPostItem(it.items, it.groups.toMutableList())
+                mapPostsToPostItem(it.items, it.groups)
             }
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
@@ -43,9 +51,7 @@ class PostsViewModel: ViewModel()  {
                     postList.value =
                         if (it.isNotEmpty()) Resource.Success(data = it) else Resource.Empty()
                 },
-                onError = {
-                    postError(it)
-                })
+                onError = { postError(it) })
             .addTo(compositeDisposable)
     }
 
@@ -53,9 +59,7 @@ class PostsViewModel: ViewModel()  {
         recyclerViewPageLoading = true
         val startFrom = postList.value?.data?.size?.plus(1) ?: 0
         postRepo.fetchNewsFeed(ITEMS_COUNT, startFrom)
-            .map {
-                mapPostsToPostItem(it.items, it.groups.toMutableList())
-            }
+            .map { mapPostsToPostItem(it.items, it.groups.toMutableList()) }
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -65,9 +69,7 @@ class PostsViewModel: ViewModel()  {
                     }
                     recyclerViewPageLoading = false
                 },
-                onError = {
-                    postError(it)
-                }
+                onError = { postError(it) }
             )
             .addTo(compositeDisposable)
     }
@@ -77,13 +79,13 @@ class PostsViewModel: ViewModel()  {
     }
 
     fun ignorePost(postItem: PostItem) {
-        compositeDisposable.addAll(postRepo.ignorePost(postItem.id, postItem.sourceId)
+        postRepo.ignorePost(postItem.id, postItem.sourceId)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { removePost(postItem) },
                 onError = { postError(it) }
             )
-        )
+            .addTo(compositeDisposable)
     }
 
     private fun postError(it: Throwable) {

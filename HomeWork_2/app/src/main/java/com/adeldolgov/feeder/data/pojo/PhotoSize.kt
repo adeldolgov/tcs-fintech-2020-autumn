@@ -8,10 +8,13 @@ import kotlinx.android.parcel.Parcelize
 data class PhotoSize(
     @SerializedName("height")
     val height: Int,
+
     @SerializedName("width")
     val width: Int,
+
     @SerializedName("type")
     val type: Char,
+
     @SerializedName("url")
     val url: String
 ): Parcelable

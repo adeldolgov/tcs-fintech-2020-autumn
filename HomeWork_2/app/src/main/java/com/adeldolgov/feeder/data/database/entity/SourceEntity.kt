@@ -8,10 +8,13 @@ import androidx.room.PrimaryKey
 class SourceEntity(
     @PrimaryKey
     val id: Long,
+
     @ColumnInfo(name = "type")
     val type: String,
+
     @ColumnInfo(name = "name")
     val name: String,
+
     @ColumnInfo(name = "photo_100")
     val photo100: String
 )

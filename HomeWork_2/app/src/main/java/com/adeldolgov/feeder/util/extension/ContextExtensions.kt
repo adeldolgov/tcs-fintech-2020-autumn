@@ -86,7 +86,7 @@ fun Context.saveImageFileToPictures(file: File): Uri? {
     val uri: Uri?
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        val relativeLocation = Environment.DIRECTORY_PICTURES + File.pathSeparator + getString(R.string.app_name)
+        val relativeLocation = Environment.DIRECTORY_PICTURES + File.separator + getString(R.string.app_name)
         values.put(MediaStore.MediaColumns.RELATIVE_PATH, relativeLocation)
         values.put(MediaStore.Images.Media.IS_PENDING, false)
         uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)

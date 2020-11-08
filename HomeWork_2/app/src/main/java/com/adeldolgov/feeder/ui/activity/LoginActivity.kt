@@ -45,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun startMainActivityAndFinishThis() {
-        startActivity(Intent(this, MainActivity::class.java))
+        MainActivity.createIntent(this)
         finish()
     }
 }
