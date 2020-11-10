@@ -14,7 +14,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.adeldolgov.feeder.BuildConfig
-import com.adeldolgov.feeder.FeederApp
 import com.adeldolgov.feeder.R
 import java.io.File
 import java.io.FileOutputStream
@@ -110,9 +109,6 @@ fun Context.saveImageFileToPictures(file: File): Uri? {
     return uri
 }
 
-fun Context.feederApp(): FeederApp {
-    return this.applicationContext as FeederApp
-}
 
 fun Context.writeStoragePermissionGranted(): Boolean {
     return ContextCompat.checkSelfPermission(

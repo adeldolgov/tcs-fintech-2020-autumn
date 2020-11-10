@@ -5,9 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.adeldolgov.feeder.R
-import com.adeldolgov.feeder.domain.viewmodel.PostsViewModel
 import com.adeldolgov.feeder.ui.fragment.NewsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -19,11 +17,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), NewsFragment.OnP
         }
     }
 
-    private var postViewModel: PostsViewModel? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        postViewModel = ViewModelProvider(this).get(PostsViewModel::class.java)
 
         mainBottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {

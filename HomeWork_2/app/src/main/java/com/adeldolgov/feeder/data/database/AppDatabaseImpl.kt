@@ -2,15 +2,14 @@ package com.adeldolgov.feeder.data.database
 
 import android.content.Context
 import androidx.room.Room
-import com.adeldolgov.feeder.FeederApp
 
-class AppDatabaseImpl {
+class AppDatabaseImpl(applicationContext: Context) {
 
     companion object {
         private const val APP_DATABASE_NAME = "app-database"
     }
 
-    val db = initAppDatabase(FeederApp.applicationContext())
+    val db = initAppDatabase(applicationContext)
 
     private fun initAppDatabase(applicationContext: Context): AppDatabase {
         return Room.databaseBuilder(

@@ -4,33 +4,31 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.os.Bundle
 import android.util.Pair
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.adeldolgov.feeder.FeederApp
 import com.adeldolgov.feeder.R
-import com.adeldolgov.feeder.domain.viewmodel.PostsViewModel
 import com.adeldolgov.feeder.ui.activity.PostDetailsActivity
 import com.adeldolgov.feeder.ui.adapter.PostAdapter
 import com.adeldolgov.feeder.ui.decorator.DateItemDecoration
 import com.adeldolgov.feeder.ui.item.PostItem
 import com.adeldolgov.feeder.ui.itemtouchhelper.SwipeItemTouchHelperCallback
 import com.adeldolgov.feeder.ui.onscrolllistener.PaginationListener
-import com.adeldolgov.feeder.util.Resource
+import com.adeldolgov.feeder.ui.presenter.NewsFeedPresenter
+import com.adeldolgov.feeder.ui.view.NewsFeedView
 import com.adeldolgov.feeder.util.extension.isShimmering
 import kotlinx.android.synthetic.main.fragment_news.*
 import kotlinx.android.synthetic.main.view_error.*
 import kotlinx.android.synthetic.main.view_social_list_shimmer.*
 import kotlinx.android.synthetic.main.view_social_post.view.*
+import moxy.MvpAppCompatFragment
+import moxy.ktx.moxyPresenter
 
-class NewsFragment : Fragment() {
+class NewsFragment : MvpAppCompatFragment(R.layout.fragment_news), NewsFeedView {
 
     companion object {
         private const val FAVORITE_ONLY = "favorite_only"
@@ -40,55 +38,31 @@ class NewsFragment : Fragment() {
         }
     }
 
-    private val postViewModel: PostsViewModel by activityViewModels()
+    private val newsFeedPresenter by moxyPresenter { NewsFeedPresenter(FeederApp.instance.applicationContainer.newsFeedRepository) }
     private val postAdapter = PostAdapter(
-        { postViewModel.changePostLike(it) },
-        { postViewModel.ignorePost(it) },
+        { newsFeedPresenter.changePostLike(it) },
+        { newsFeedPresenter.ignorePost(it) },
         { position, postItem -> prepareDetailOptionsAndStartDetailsActivity(position, postItem) })
+
     private var shouldScrollToStart = false
     private var newsFragmentListener: OnPostLikeListener? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_news, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postViewModel.postList.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Resource.Success -> {
-                    showLoadingScreen(false)
-                    updateRecyclerAdapterPostsAndScrollToStart(it.data)
-                }
-                is Resource.Empty -> {
-                    showLoadingScreen(false)
-                    showErrorScreenWithContent(getString(R.string.error_header_empty), getString(R.string.error_empty))
-                }
-                is Resource.Loading -> {
-                    hideErrorScreen()
-                    showLoadingScreen(true)
-                }
-                is Resource.Failure -> {
-                    showLoadingScreen(false)
-                    showErrorScreenWithContent(getString(R.string.error_header), it.message)
-                }
-            }
-        })
-
         postRecyclerView.apply {
             adapter = postAdapter
             ItemTouchHelper(SwipeItemTouchHelperCallback(postAdapter)).attachToRecyclerView(this)
             addItemDecoration(DateItemDecoration(postAdapter))
             addOnScrollListener(object : PaginationListener(layoutManager as LinearLayoutManager) {
-                override fun loadMoreItems() = postViewModel.fetchNewPosts()
+                override fun loadMoreItems() = newsFeedPresenter.fetchNewPosts()
                 override val isLastPage: Boolean = false
-                override fun isLoading(): Boolean = postViewModel.recyclerViewPageLoading
+                override fun isLoading(): Boolean = newsFeedPresenter.recyclerViewPageLoading
             })
         }
 
         swipeRefreshLayout.setOnRefreshListener {
             shouldScrollToStart = true
-            postViewModel.getPosts(true)
+            newsFeedPresenter.getPosts(true)
             swipeRefreshLayout.isRefreshing = false
         }
     }
@@ -98,6 +72,26 @@ class NewsFragment : Fragment() {
         if (context is OnPostLikeListener) {
             newsFragmentListener = context
         }
+    }
+
+    override fun showNewsFeed(posts: List<PostItem>) {
+        showLoadingScreen(false)
+        updateRecyclerAdapterPostsAndScrollToStart(posts)
+    }
+
+    override fun showEmptyState() {
+        showLoadingScreen(false)
+        showErrorScreenWithContent(getString(R.string.error_header_empty), getString(R.string.error_empty))
+    }
+
+    override fun showError(error: String) {
+        showLoadingScreen(false)
+        showErrorScreenWithContent(getString(R.string.error_header), error)
+    }
+
+    override fun showLoading(isFullScreenLoading: Boolean) {
+        hideErrorScreen()
+        showLoadingScreen(true)
     }
 
     private fun showLoadingScreen(show: Boolean) {

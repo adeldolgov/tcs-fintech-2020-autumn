@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-class VKServiceImpl {
+class VKServiceImpl(private val vkToken: String) {
 
     companion object {
         private const val BASE_URL = "https://api.vk.com/method/"
@@ -27,7 +27,7 @@ class VKServiceImpl {
 
     private fun createOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(VKAuthInterceptor())
+            .addInterceptor(VKAuthInterceptor(vkToken))
             .build()
     }
 

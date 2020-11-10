@@ -5,7 +5,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
-import com.adeldolgov.feeder.util.Session
+import com.adeldolgov.feeder.di.ApplicationContainer
 
 class FeederApp : Application() {
 
@@ -14,15 +14,15 @@ class FeederApp : Application() {
     }
 
     companion object {
-        private var instance: FeederApp? = null
-        var isNetworkAvailable: Boolean = false
-        fun applicationContext() : Context {
-            return instance!!.applicationContext
-        }
+        lateinit var instance: FeederApp
     }
+
+    var isNetworkAvailable: Boolean = false
+    lateinit var applicationContainer: ApplicationContainer
 
     override fun onCreate() {
         super.onCreate()
+        applicationContainer = ApplicationContainer(this)
         registerNetworkCallback()
     }
 
@@ -41,7 +41,4 @@ class FeederApp : Application() {
     }
 
 
-    fun setVKTokenForSession(token: String?) {
-        Session.VK_TOKEN = token
-    }
 }

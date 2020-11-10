@@ -14,10 +14,9 @@ import com.adeldolgov.feeder.data.server.VKService
 import com.adeldolgov.feeder.util.timeoutpolicy.CacheTimeoutPolicy
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
-import io.reactivex.schedulers.Schedulers
 import java.net.UnknownHostException
 
-class NewsRepository(
+class NewsFeedRepository(
     private val vkService: VKService,
     private val appDatabase: AppDatabase,
     private val cacheTimeoutPolicy: CacheTimeoutPolicy
@@ -25,14 +24,14 @@ class NewsRepository(
 
 
     fun getNewsFeedAtStart(ignoreCacheTimeout: Boolean, count: Int): Single<NewsFeed> {
-        return if (FeederApp.isNetworkAvailable && (!cacheTimeoutPolicy.isValid() || ignoreCacheTimeout))
+        return if (FeederApp.instance.isNetworkAvailable && (!cacheTimeoutPolicy.isValid() || ignoreCacheTimeout))
             loadActualDataFromNetworkAndUpdateLocal(count, 0).doOnSubscribe { deleteDataInDatabase() }
         else
             loadLocalDataFromDatabase()
     }
 
     fun fetchNewsFeed(count: Int, startFrom: Int): Single<NewsFeed> {
-        return Single.just(FeederApp.isNetworkAvailable)
+        return Single.just(FeederApp.instance.isNetworkAvailable)
             .map {
                 if (it) loadActualDataFromNetworkAndUpdateLocal(count, startFrom).blockingGet()
                 else throw UnknownHostException()
@@ -42,7 +41,6 @@ class NewsRepository(
     fun addLikeAtPost(postId: Long, ownerId: Long): Single<Count> {
         return vkService
             .addLikeAtPost(postId, ownerId)
-            .subscribeOn(Schedulers.io())
             .map {
                 if (it.error != null) throw Exception(it.error.errorMsg) else it.response
             }
@@ -53,7 +51,6 @@ class NewsRepository(
     fun deleteLikeAtPost(postId: Long, ownerId: Long): Single<Count> {
         return vkService
             .deleteLikeAtPost(postId, ownerId)
-            .subscribeOn(Schedulers.io())
             .map {
                 if (it.error != null) throw Exception(it.error.errorMsg) else it.response
             }
@@ -63,7 +60,6 @@ class NewsRepository(
     fun ignorePost(postId: Long, ownerId: Long): Single<Int> {
         return vkService
             .ignorePost(postId, ownerId)
-            .subscribeOn(Schedulers.io())
             .map {
                 if (it.error != null) throw Exception(it.error.errorMsg) else it.response
             }
@@ -73,7 +69,6 @@ class NewsRepository(
     private fun loadActualDataFromNetworkAndUpdateLocal(count: Int, startFrom: Int): Single<NewsFeed> {
         return vkService
             .getNewsFeedPosts(count, startFrom)
-            .subscribeOn(Schedulers.io())
             .map {
                 if (it.error != null) throw Exception(it.error.errorMsg) else it.response
             }
@@ -122,14 +117,12 @@ class NewsRepository(
     private fun getPostsFromDatabase(): Single<List<Post>> {
         return appDatabase.postDao()
             .getPosts()
-            .subscribeOn(Schedulers.io())
             .map { it.map { postEntity -> postEntity.toPost() } }
     }
 
     private fun getSourcesFromDatabase(): Single<List<Source>> {
         return appDatabase.sourceDao()
             .getSources()
-            .subscribeOn(Schedulers.io())
             .map { it.map { sourceEntity -> sourceEntity.toSource() } }
     }
 

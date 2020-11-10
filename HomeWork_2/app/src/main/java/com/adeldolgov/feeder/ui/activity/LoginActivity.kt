@@ -3,9 +3,8 @@ package com.adeldolgov.feeder.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.adeldolgov.feeder.FeederApp
 import com.adeldolgov.feeder.R
-import com.adeldolgov.feeder.util.ApplicationPreferences
-import com.adeldolgov.feeder.util.extension.feederApp
 import com.adeldolgov.feeder.util.extension.toast
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.auth.VKAccessToken
@@ -17,9 +16,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
         if (VK.isLoggedIn()) {
-            feederApp().setVKTokenForSession(ApplicationPreferences(this).getVKToken())
             startMainActivityAndFinishThis()
         }
         vkLoginBtn.setOnClickListener {
@@ -30,8 +27,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val callback = object : VKAuthCallback {
             override fun onLogin(token: VKAccessToken) {
-                ApplicationPreferences(this@LoginActivity).setVKToken(token.accessToken)
-                feederApp().setVKTokenForSession(token.accessToken)
+                FeederApp.instance.applicationContainer.preferences.setVKToken(token.accessToken)
                 startMainActivityAndFinishThis()
             }
 
@@ -45,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun startMainActivityAndFinishThis() {
-        MainActivity.createIntent(this)
+        startActivity(MainActivity.createIntent(this))
         finish()
     }
 }
