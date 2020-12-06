@@ -1,8 +1,6 @@
 package com.adeldolgov.feeder.ui.viewgroup
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
@@ -30,7 +28,7 @@ class SocialDetailPostViewGroup @JvmOverloads constructor(
 
     init {
         setWillNotDraw(true)
-        LayoutInflater.from(context).inflate(R.layout.view_social_post_details, this, true)
+        LayoutInflater.from(context).inflate(R.layout.view_social_post_detail, this, true)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -163,24 +161,13 @@ class SocialDetailPostViewGroup @JvmOverloads constructor(
 
     override fun generateDefaultLayoutParams() = MarginLayoutParams(WRAP_CONTENT, WRAP_CONTENT)
 
-    fun setPostDetails(
-        postItem: PostItem, imageLoader: ImageLoader,
-        onImageClickListener: (String) -> Unit,
-        onShareClickListener: (Bitmap?) -> Unit
-    ) {
-        postItem.attachments?.first()?.photo?.sizes?.last()?.url?.let { url ->
-            imageLoader.loadPoster(url, postContentImage)
-            postContentImage.setOnClickListener {
-                onImageClickListener(url)
-            }
-        }
-
-        postShareBtn.setOnClickListener {
-            val bitmap = (postContentImage.drawable as BitmapDrawable?)?.bitmap
-            onShareClickListener(bitmap)
-        }
+    fun updatePostDetails(imageLoader: ImageLoader, postItem: PostItem) {
 
         imageLoader.loadRoundedAvatar(postItem.sourceImage, postOwnerImage)
+        postItem.attachments?.first()?.photo?.sizes?.last()?.url?.let { url ->
+            imageLoader.loadPoster(url, postContentImage)
+            postContentImage.isClickable = true
+        }
 
         postContentText.text = postItem.text
         postOwnerText.text = postItem.sourceName
@@ -190,6 +177,7 @@ class SocialDetailPostViewGroup @JvmOverloads constructor(
         } else {
             postLikeBtn.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_outline))
         }
+
         postTimeText.text = postItem.date.toRelativeDateString()
         postLikeCountText.text = postItem.likes.toString()
         postShareCountText.text = postItem.reposts.toString()

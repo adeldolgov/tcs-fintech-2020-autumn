@@ -28,7 +28,8 @@
         </activity>
         <activity
             android:label="@string/details_watch"
-            android:name=".ui.activity.PostDetailsActivity">
+            android:name=".ui.activity.PostDetailActivity"
+            android:windowSoftInputMode="adjustResize">
         </activity>
         <provider
             android:name="androidx.core.content.FileProvider"

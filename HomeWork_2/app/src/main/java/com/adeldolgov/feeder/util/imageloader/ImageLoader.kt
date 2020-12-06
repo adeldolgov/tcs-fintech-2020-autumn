@@ -13,7 +13,11 @@ interface ImageLoader {
 
     fun loadRoundedAvatar(url: String, targetView: ImageView)
 
+    fun loadAvatar(url: String, targetView: ImageView)
+
     fun getFileFromUrl(url: String, context: Context): File
+
+    fun loadPhotoFromFile(file: File, targetView: ImageView)
 
     interface OnImageLoadListener {
 

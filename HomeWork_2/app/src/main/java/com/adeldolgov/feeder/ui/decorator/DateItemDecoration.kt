@@ -29,11 +29,11 @@ class DateItemDecoration(private val dateItemInterface: DateItemInterface) : Rec
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         super.onDraw(canvas, parent, state)
         parent.children.forEach { child ->
-            val currentPos = parent.getChildAdapterPosition(child)
-            if (currentPos == -1) return
+            val viewHolder = parent.getChildViewHolder(child)
+            val relativePos = getRelativePosition(viewHolder)
 
-            if (dateItemInterface.shouldWriteDate(currentPos)) {
-                val currentRelativeDateStr = dateItemInterface.getDateAtPosition(currentPos)
+            if (relativePos != -1 && dateItemInterface.shouldWriteDate(relativePos)) {
+                val currentRelativeDateStr = dateItemInterface.getDateAtPosition(relativePos)
 
                 textPaint.color = Color.WHITE
                 textPaint.textSize = (DATE_TEXT_SIZE.sp.toFloat())
@@ -61,15 +61,25 @@ class DateItemDecoration(private val dateItemInterface: DateItemInterface) : Rec
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)
-        val currentPos = parent.getChildAdapterPosition(view)
-        if (currentPos == -1) return
+        val viewHolder = parent.getChildViewHolder(view)
+        val relativePos = getRelativePosition(viewHolder)
 
-        if (dateItemInterface.shouldWriteDate(currentPos)) {
+        if (relativePos == -1) return
+
+        if (dateItemInterface.shouldWriteDate(relativePos)) {
             outRect.top = PADDING_TOP_DATE.dp
         } else {
             outRect.top = PADDING_DEFAULT.dp
         }
-        if (currentPos == (parent.adapter?.itemCount ?: 1) - 1) outRect.bottom = PADDING_DEFAULT.dp
+        if (relativePos == (parent.adapter?.itemCount ?: 1) - 1) outRect.bottom = PADDING_DEFAULT.dp
+    }
+
+    private fun getRelativePosition(viewHolder: RecyclerView.ViewHolder): Int {
+        return if (viewHolder.bindingAdapter is DateItemInterface) {
+            viewHolder.bindingAdapterPosition
+        } else {
+            -1
+        }
     }
 
     interface DateItemInterface {

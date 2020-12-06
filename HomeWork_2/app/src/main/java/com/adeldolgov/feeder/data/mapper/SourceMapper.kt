@@ -6,12 +6,10 @@ import com.adeldolgov.feeder.data.pojo.Source
 
 fun Source.toSourceEntity(): SourceEntity =
     SourceEntity(
-        id = id,
+        id = id * -1,
         type = type,
         name = name,
         photo100 = photo100
     )
 
-fun SourceEntity.toSource(): Source = Source(id, type, name, photo100)
-
-fun Profile.toSource(): Source = Source(id, "post", "$firstName $lastName", photo100)
+fun Profile.toSource(): Source = Source(id * -1, "post", "$firstName $lastName", photo100)

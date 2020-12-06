@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.facebook.shimmer.ShimmerFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/shimmerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone"
+    tools:visibility="visible"
+    app:shimmer_duration="1200"
+    app:shimmer_tilt="0"
+    app:shimmer_width_ratio="0.7"
+    app:shimmer_repeat_mode="restart"
+    app:shimmer_shape="linear">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/view_profile_placeholder"/>
+
+        <include
+            layout="@layout/view_profile_field_header_placeholder"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginTop="8dp" />
+
+        <include layout="@layout/view_profile_field_placeholder"/>
+
+        <include
+            layout="@layout/view_profile_field_header_placeholder"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginTop="8dp" />
+
+        <include layout="@layout/view_profile_field_placeholder"/>
+
+        <include
+            layout="@layout/view_profile_field_header_placeholder"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginTop="8dp" />
+
+        <include layout="@layout/view_profile_field_placeholder"/>
+
+
+    </LinearLayout>
+
+</com.facebook.shimmer.ShimmerFrameLayout>

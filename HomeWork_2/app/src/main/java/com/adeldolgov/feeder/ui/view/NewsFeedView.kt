@@ -8,6 +8,7 @@ import moxy.viewstate.strategy.StateStrategyType
 
 
 interface NewsFeedView : MvpView {
+
     @StateStrategyType(value = AddToEndSingleStrategy::class)
     fun showNewsFeed(posts: List<PostItem>)
 
@@ -15,9 +16,15 @@ interface NewsFeedView : MvpView {
     fun showEmptyState()
 
     @StateStrategyType(value = OneExecutionStateStrategy::class)
-    fun showError(error: String)
+    fun showError(error: Throwable)
+
+    @StateStrategyType(value = OneExecutionStateStrategy::class)
+    fun showPostsFetchingError(error: Throwable)
 
     @StateStrategyType(value = OneExecutionStateStrategy::class)
     fun showLoading(isFullScreenLoading: Boolean)
+
+    @StateStrategyType(value = OneExecutionStateStrategy::class)
+    fun hideLoading()
 
 }

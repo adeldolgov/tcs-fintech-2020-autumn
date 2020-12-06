@@ -1,27 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="vertical"
-    android:clipToPadding="false"
-    android:paddingBottom="36dp"
-    tools:context=".ui.activity.PostDetailsActivity">
+    tools:context=".ui.activity.PostDetailActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/postDetailRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/bottomCommentCard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/postCard"
+        android:id="@+id/bottomCommentCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:transitionName="postCard"
-        app:cardPreventCornerOverlap="false">
+        app:cardElevation="10dp"
+        style="@style/Widget.App.CardView.BottomSheet"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <com.adeldolgov.feeder.ui.viewgroup.SocialDetailPostViewGroup
-            android:id="@+id/postDetails"
+        <EditText
+            android:id="@+id/commentEditText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="56dp"
+            android:layout_marginBottom="16dp"
+            android:background="@null"
+            android:hint="@string/comment"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLines="5" />
 
+        <ImageButton
+            android:id="@+id/sendBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_send" />
+
+        <ProgressBar
+            android:id="@+id/sendingProgress"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end|bottom"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
     </com.google.android.material.card.MaterialCardView>
 
-</ScrollView>
+    <include
+        layout="@layout/view_error"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

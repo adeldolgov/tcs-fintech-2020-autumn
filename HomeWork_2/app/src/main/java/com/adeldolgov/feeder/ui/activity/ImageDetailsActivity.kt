@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import com.adeldolgov.feeder.R
 import com.adeldolgov.feeder.util.extension.*
 import com.adeldolgov.feeder.util.imageloader.GlideImageLoader
@@ -26,11 +25,14 @@ class ImageDetailsActivity : AppCompatActivity(R.layout.activity_details_image) 
 
     companion object {
         private const val IMAGE_ARG = "IMAGE_ARG"
+        private const val TRANSITION_ARG = "TRANSITION_ARG"
+
         private const val WRITE_STORAGE_PERMISSION_REQUEST_CODE = 515
 
-        fun createIntent(context: Context, imageUrl: String): Intent {
+        fun createIntent(context: Context, imageUrl: String, transitionName: String): Intent {
             return Intent(context, ImageDetailsActivity::class.java).apply {
                 putExtra(IMAGE_ARG, imageUrl)
+                putExtra(TRANSITION_ARG, transitionName)
             }
         }
     }
@@ -43,6 +45,7 @@ class ImageDetailsActivity : AppCompatActivity(R.layout.activity_details_image) 
         super.onCreate(savedInstanceState)
         setSupportActionBar(appToolbar)
         supportActionBar?.setTitle(R.string.details_watch)
+        detailsImage.transitionName = intent.getStringExtra(TRANSITION_ARG)
         photoUrl = intent.getStringExtra(IMAGE_ARG)
         photoUrl?.let {
             imageLoader.loadPoster(it, detailsImage)
@@ -69,7 +72,7 @@ class ImageDetailsActivity : AppCompatActivity(R.layout.activity_details_image) 
 
     private fun savePhotoFileOrAskForPermissions(){
         if (writeStoragePermissionGranted()) photoUrl?.let { saveBitmapFromUrl(it) }
-        else requestStoragePermission()
+        else requestStoragePermission(WRITE_STORAGE_PERMISSION_REQUEST_CODE)
     }
 
     private fun openShareChooserIfImageViewReady() {
@@ -106,12 +109,6 @@ class ImageDetailsActivity : AppCompatActivity(R.layout.activity_details_image) 
         }
     }
 
-    private fun requestStoragePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            toast(getString(R.string.permission_storage))
-        }
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WRITE_STORAGE_PERMISSION_REQUEST_CODE)
-    }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)

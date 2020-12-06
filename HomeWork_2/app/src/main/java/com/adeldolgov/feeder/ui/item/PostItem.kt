@@ -16,7 +16,8 @@ data class PostItem (
     val attachments: Array<Attachment>?,
     var likes: Int,
     var reposts: Int,
-    var comments: Int
+    var comments: Int,
+    val canComment: Boolean
 ) : Parcelable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -38,6 +39,7 @@ data class PostItem (
         if (likes != other.likes) return false
         if (reposts != other.reposts) return false
         if (comments != other.comments) return false
+        if (canComment != other.canComment) return false
 
         return true
     }
@@ -54,6 +56,7 @@ data class PostItem (
         result = 31 * result + likes
         result = 31 * result + reposts
         result = 31 * result + comments
+        result = 31 * result + canComment.hashCode()
         return result
     }
 

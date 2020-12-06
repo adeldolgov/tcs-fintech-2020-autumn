@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="com.adeldolgov.feeder.ui.viewgroup.SocialPostCommentViewGroup">
+
+    <TextView
+        android:id="@+id/commentOwnerText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:transitionName="commentOwnerText"
+        tools:text="Comment Owner" />
+
+    <TextView
+        android:id="@+id/commentTimeText"
+        style="@style/SecondaryTextTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
+        android:transitionName="commentTimeText"
+        tools:text="5 minutes ago" />
+
+    <ImageView
+        android:id="@+id/commentOwnerImage"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:transitionName="commentOwnerImage"
+        tools:src="@drawable/ic_linkedin_round" />
+
+    <TextView
+        android:id="@+id/commentContentText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="16sp"
+        android:transitionName="commentContentText"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nCras vitae ex molestie, vulputate nisl vel, placerat dolor. Donec elementum nibh vitae gravida cursus." />
+
+    <ImageView
+        android:id="@+id/commentContentImage"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="16dp"
+        android:adjustViewBounds="true"
+        android:transitionName="commentContentImage"
+        tools:src="@drawable/ic_launcher_background" />
+
+    <ImageButton
+        android:id="@+id/commentLikeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="8dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_favorite_outline"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/commentLikeCountText"
+        style="@style/SecondaryTextTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="3.5dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="invisible"
+        tools:text="375" />
+
+</merge>

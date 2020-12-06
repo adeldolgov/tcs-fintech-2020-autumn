@@ -19,6 +19,9 @@ interface SourceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg sourceEntities: SourceEntity)
 
+    @Query("DELETE FROM source WHERE NOT EXISTS (SELECT 1 FROM post WHERE source_id = source.id) AND NOT EXISTS (SELECT 1 FROM comment WHERE from_id = source.id)")
+    fun deleteDataFromTableWhichHasNoReferences()
+
     @Query("DELETE FROM source")
     fun deleteDataFromTable()
 }

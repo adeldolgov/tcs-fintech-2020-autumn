@@ -2,16 +2,14 @@ package com.adeldolgov.feeder.data.pojo
 
 import com.google.gson.annotations.SerializedName
 
-data class NewsFeed(
-    @SerializedName("items")
-    val items: List<Post>,
+class NewsFeed(
+    items: List<NewsFeedPost>,
 
-    @SerializedName("profiles")
-    val profiles: List<Profile>,
+    profiles: List<Profile>,
 
-    @SerializedName("groups")
-    val groups: List<Source>,
+    groups: List<Source>,
 
     @SerializedName("next_from")
     val nextFrom: String
-)
+
+) : BaseItemsHolder<NewsFeedPost>(items, profiles, groups)

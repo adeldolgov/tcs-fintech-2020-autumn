@@ -55,7 +55,7 @@ class PostAdapter(
         return PostViewHolder(
             inflater.inflate(R.layout.item_post, parent, false),
             clickLikeListener = { swipeLeftListener(posts[it]) },
-            clickListener = { onClickListener(it, posts[it]) },
+            clickListener = { absPos, bindPos -> onClickListener(absPos, posts[bindPos]) },
             imageLoader = imageLoader
         )
     }
@@ -64,7 +64,7 @@ class PostAdapter(
         return PostWithImageViewHolder(
             inflater.inflate(R.layout.item_post, parent, false),
             clickLikeListener = { swipeLeftListener(posts[it]) },
-            clickListener = { onClickListener(it, posts[it]) },
+            clickListener = { absPos, bindPos -> onClickListener(absPos, posts[bindPos]) },
             imageLoader = imageLoader
         )
     }
@@ -90,7 +90,6 @@ class PostAdapter(
 
     override fun shouldWriteDate(position: Int): Boolean {
         if (position == 0) return true
-
         val currentDate = Date(posts[position].date * DateUtils.SECOND_IN_MILLIS)
         val prevDate = Date(posts[position - 1].date * DateUtils.SECOND_IN_MILLIS)
         return !currentDate.compareToExcludeTime(prevDate)
@@ -106,12 +105,12 @@ class PostAdapter(
 
     class PostWithImageViewHolder(view: View,
         clickLikeListener: (Int) -> Unit,
-        clickListener: (Int) -> Unit,
+        clickListener: (Int, Int) -> Unit,
         val imageLoader: ImageLoader
     ) : BaseViewHolder(view) {
         init {
-            itemView.postLikeBtn.setOnClickListener { clickLikeListener(adapterPosition) }
-            itemView.setOnClickListener { clickListener(adapterPosition) }
+            itemView.postLikeBtn.debounceClick { clickLikeListener(bindingAdapterPosition) }
+            itemView.debounceClick { clickListener(absoluteAdapterPosition, bindingAdapterPosition) }
         }
 
         override fun bind(post: PostItem) {
@@ -134,7 +133,7 @@ class PostAdapter(
                 postLikeCountText.text = post.likes.toString()
                 postShareCountText.text = post.reposts.toString()
                 postCommentCountText.text = post.comments.toString()
-                postShareBtn.setOnClickListener {
+                postShareBtn.debounceClick {
                     (postContentImage.drawable as BitmapDrawable?)?.bitmap?.let {
                         context.sharePhotoFile(post.text, post.sourceName, context.saveImageToCache(it))
                     }
@@ -146,12 +145,12 @@ class PostAdapter(
     class PostViewHolder(
         view: View,
         clickLikeListener: (Int) -> Unit,
-        clickListener: (Int) -> Unit,
+        clickListener: (Int, Int) -> Unit,
         val imageLoader: ImageLoader
     ) : BaseViewHolder(view) {
         init {
-            itemView.postLikeBtn.setOnClickListener { clickLikeListener(adapterPosition) }
-            itemView.setOnClickListener { clickListener(adapterPosition) }
+            itemView.postLikeBtn.debounceClick { clickLikeListener(bindingAdapterPosition) }
+            itemView.debounceClick { clickListener(absoluteAdapterPosition, bindingAdapterPosition) }
         }
 
         override fun bind(post: PostItem) {
@@ -170,7 +169,7 @@ class PostAdapter(
                 postLikeCountText.text = post.likes.toString()
                 postShareCountText.text = post.reposts.toString()
                 postCommentCountText.text = post.comments.toString()
-                postShareBtn.setOnClickListener {
+                postShareBtn.debounceClick {
                     context.shareTextMessage(post.text, post.sourceName)
                 }
             }

@@ -3,6 +3,8 @@ package com.adeldolgov.feeder.data.database.entity
 import androidx.room.*
 import com.adeldolgov.feeder.data.mapper.AttachmentConverter
 import com.adeldolgov.feeder.data.pojo.Attachment
+import com.adeldolgov.feeder.util.PostType
+import java.util.*
 
 @Entity(
     tableName = "post",
@@ -21,7 +23,7 @@ class PostEntity(
     @ColumnInfo(name = "date")
     val date: Long,
 
-    @ColumnInfo(name = "source_id")
+    @ColumnInfo(name = "source_id", index = true)
     val sourceId: Long,
 
     @ColumnInfo(name = "text")
@@ -41,5 +43,11 @@ class PostEntity(
     val repostsCount: Int,
 
     @ColumnInfo(name = "comments_count")
-    val commentsCount: Int
+    val commentsCount: Int,
+
+    @ColumnInfo(name = "post_types")
+    var postTypes: EnumSet<PostType>,
+
+    @ColumnInfo(name = "canComment")
+    val canComment: Boolean
 )

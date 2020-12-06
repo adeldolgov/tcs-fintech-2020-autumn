@@ -10,6 +10,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.signature.ObjectKey
 import java.io.File
 
 class GlideImageLoader : ImageLoader {
@@ -61,12 +62,25 @@ class GlideImageLoader : ImageLoader {
             .into(targetView)
     }
 
+    override fun loadAvatar(url: String, targetView: ImageView) {
+        Glide.with(targetView)
+            .load(url)
+            .into(targetView)
+    }
+
     override fun getFileFromUrl(url: String, context: Context): File {
         return Glide.with(context)
             .asFile()
             .load(url)
             .submit()
             .get()
+    }
+
+    override fun loadPhotoFromFile(file: File, targetView: ImageView) {
+        Glide.with(targetView)
+            .load(file)
+            .signature(ObjectKey(System.currentTimeMillis()))
+            .into(targetView)
     }
 
 }

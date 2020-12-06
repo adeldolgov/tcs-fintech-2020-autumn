@@ -6,12 +6,51 @@
     <string name="welcome_to_feeder">Добро пожаловать в Feeder. \nВсе ваши новости в одном приложении. :)</string>
     <string name="login_with">Войти с помощью</string>
 
-    <!-- NewsFeed -->
+    <!-- List -->
     <string name="repeat">Повторить</string>
+    <string name="empty">Пусто!</string>
+    <string name="comments_empty">Ни одного комментария. Совсем.</string>
 
     <!-- Bottom bar menu -->
     <string name="news">Новости</string>
     <string name="favorite">Избранное</string>
+    <string name="profile">Профиль</string>
+
+    <!-- Post details -->
+    <string name="comment">Комментарий</string>
+
+    <!-- Profile -->
+    <string name="online">онлайн</string>
+    <string name="was_online">был онлайн %s</string>
+    <string name="city">Город</string>
+    <string name="age">Возраст</string>
+    <string name="job">Работа</string>
+    <string name="followers">подписчиков</string>
+    <string name="location">Местоположение</string>
+    <string name="education">Образование</string>
+    <string name="no_posts">Ни одного поста. Напишите его прямо сейчас! :)</string>
+    <string name="current_time">наст. время</string>
+    <string name="whats_new">Что нового? Поделитесь вашими мыслями со всеми…</string>
+    <string name="send">Отправить</string>
+    <string name="new_post">Новый пост</string>
+    <string name="no_internet_connection">Интернет соединение\nнедоступно</string>
+
+    <plurals name="years">
+        <item quantity="zero">всё ясно, автору 0 лет</item>
+        <item quantity="one">%1$d год</item>
+        <item quantity="two">%1$d года</item>
+        <item quantity="few">%1$d года</item>
+        <item quantity="many">%1$d лет</item>
+        <item quantity="other">%1$d лет</item>
+    </plurals>
+    <plurals name="followers">
+        <item quantity="zero">подписчиков</item>
+        <item quantity="one">подписчик</item>
+        <item quantity="two">подписчика</item>
+        <item quantity="few">подписчика</item>
+        <item quantity="many">подписчиков</item>
+        <item quantity="other">подписчиков</item>
+    </plurals>
 
     <!-- Image details -->
     <string name="save">Сохранить</string>
@@ -30,7 +69,10 @@
     <string name="error_vk_login">Не удалось войти в аккаунт, пожалуйста, повторите позднее.\nКод ошибки - %d</string>
     <string name="error_image_loading">Произошла ошибка при загрузке фото. Повторите позднее.</string>
     <string name="error_save_picture">Не удалось сохранить фотографию.</string>
-
+    <string name="error_network">Соединение с интернетом отсутствует. Пожалуйста, проверьте подключение.</string>
+    <string name="error_no_data">Сохранённая информация отсутствует. Пожалуйста, подключитесь к сети.</string>
+    <string name="error_null">Где-то произошла ошибка… Простите.</string>
+    <string name="error_no_field">Не указан</string>
 
 
 </resources>

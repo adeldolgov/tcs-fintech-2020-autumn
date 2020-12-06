@@ -29,7 +29,6 @@ class SocialPostViewGroup @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-
         var height = 0
 
         measureChildWithMargins(postOwnerImage, widthMeasureSpec, 0, heightMeasureSpec, height)

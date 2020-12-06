@@ -1,0 +1,7 @@
+package com.adeldolgov.feeder.di.scope
+
+import javax.inject.Scope
+
+@Scope
+@Retention(AnnotationRetention.RUNTIME)
+annotation class PostDetailsScope

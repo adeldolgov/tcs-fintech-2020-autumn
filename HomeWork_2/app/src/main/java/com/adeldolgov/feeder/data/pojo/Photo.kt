@@ -6,6 +6,12 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Photo(
+    @SerializedName("id")
+    val id: Long,
+
+    @SerializedName("owner_id")
+    val ownerId: Long,
+
     @SerializedName("sizes")
     val sizes: Array<PhotoSize>
 ) : Parcelable {
@@ -15,12 +21,17 @@ data class Photo(
 
         other as Photo
 
+        if (id != other.id) return false
+        if (ownerId != other.ownerId) return false
         if (!sizes.contentEquals(other.sizes)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return sizes.contentHashCode()
+        var result = id.hashCode()
+        result = 31 * result + ownerId.hashCode()
+        result = 31 * result + sizes.contentHashCode()
+        return result
     }
 }
