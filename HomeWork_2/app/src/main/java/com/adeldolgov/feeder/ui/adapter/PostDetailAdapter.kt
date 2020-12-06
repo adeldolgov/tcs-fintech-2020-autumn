@@ -12,6 +12,7 @@ import com.adeldolgov.feeder.ui.item.PostItem
 import com.adeldolgov.feeder.util.extension.debounceClick
 import com.adeldolgov.feeder.util.extension.saveImageToCache
 import com.adeldolgov.feeder.util.extension.sharePhotoFile
+import com.adeldolgov.feeder.util.extension.shareTextMessage
 import com.adeldolgov.feeder.util.imageloader.ImageLoader
 import kotlinx.android.synthetic.main.item_post_detail.view.*
 import kotlinx.android.synthetic.main.view_social_post.view.*
@@ -83,8 +84,12 @@ class PostDetailAdapter(
             with(itemView) {
                 itemView.detailPostViewGroup.updatePostDetails(postItem = post, imageLoader = imageLoader)
                 postShareBtn.debounceClick {
-                    (postContentImage.drawable as BitmapDrawable?)?.bitmap?.let {
-                        context.sharePhotoFile(post.text, post.sourceName, context.saveImageToCache(it))
+                    if (post.attachments?.first()?.photo?.sizes?.size == null) {
+                        context.shareTextMessage(post.text, post.sourceName)
+                    } else {
+                        (postContentImage.drawable as BitmapDrawable?)?.bitmap?.let {
+                            context.sharePhotoFile(post.text, post.sourceName, context.saveImageToCache(it))
+                        }
                     }
                 }
             }
